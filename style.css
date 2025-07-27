@@ -64,7 +64,60 @@ footer {
   left: 0;
 }
 /*------------*/
-h1 {
-  text-shadow: 0 0 8px #00ffff, 0 0 20px #00ffff;
-  color: #00ffff;
+.floating-icons {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
 }
+
+.floating-icons span {
+  position: absolute;
+  font-size: 2rem;
+  animation: float 20s linear infinite;
+  opacity: 0.4;
+}
+
+/* Random starting positions and speeds */
+.floating-icons span:nth-child(1) {
+  top: 10%;
+  left: 20%;
+  animation-duration: 25s;
+}
+.floating-icons span:nth-child(2) {
+  top: 30%;
+  left: 70%;
+  animation-duration: 18s;
+}
+.floating-icons span:nth-child(3) {
+  top: 50%;
+  left: 40%;
+  animation-duration: 22s;
+}
+.floating-icons span:nth-child(4) {
+  top: 70%;
+  left: 10%;
+  animation-duration: 20s;
+}
+.floating-icons span:nth-child(5) {
+  top: 80%;
+  left: 80%;
+  animation-duration: 26s;
+}
+
+/* Animation keyframes */
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
