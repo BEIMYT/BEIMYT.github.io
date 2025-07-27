@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
+
+  <div id="tsparticles"></div>
    <meta charset="UTF-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <meta name="keywords" content="beim, blog, YouTube, Discord, Ikaroaroaro, Ikaro, Ikaros, BEIM" />
@@ -9,6 +10,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
+  <script>
+  tsParticles.load("tsparticles", {
+    background: {
+      color: {
+        value: "transparent"
+      }
+    },
+    particles: {
+      number: {
+        value: 60
+      },
+      color: {
+        value: "#00ffff"
+      },
+      shape: {
+        type: "circle"
+      },
+      opacity: {
+        value: 0.5
+      },
+      size: {
+        value: { min: 1, max: 4 }
+      },
+      move: {
+        enable: true,
+        speed: 0.5,
+        direction: "none",
+        random: false,
+        straight: false,
+        outModes: {
+          default: "bounce"
+        }
+      },
+      links: {
+        enable: true,
+        color: "#00ffff",
+        distance: 100,
+        opacity: 0.4,
+        width: 1
+      }
+    },
+    fullScreen: {
+      enable: false
+    }
+  });
+</script>
+
+  
 </head>
 <body>
   <header>
