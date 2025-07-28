@@ -143,10 +143,10 @@ footer {
 /* Link in rocket*/
 .floating-rocket {
   position: absolute;
-  bottom: -5%;
-  left: 70%;
+  bottom: 0%%;
+  left: 60%%;
   animation: floatRocket 18s linear infinite;
-  animation-fill-mode: none; /* <-- THIS IS CRITICAL */
+  animation-fill-mode: none; 
   font-size: 2rem;
   opacity: 0.4;
   z-index: 10;
