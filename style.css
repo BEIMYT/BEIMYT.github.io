@@ -120,12 +120,26 @@ footer {
     opacity: 0;
   }
 }
+/*Animation Rocket*/
+@keyframes floatRocket {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
 /* Link in rockets*/
 .floating-rocket {
   position: absolute;
-  top: 30%;
+  bottom: -5%;
   left: 70%;
-  animation: float 18s linear infinite;
+  animation: floatRocket 18s linear infinite;
   font-size: 2rem;
   opacity: 0.4;
   z-index: 10;
