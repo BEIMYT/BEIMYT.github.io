@@ -134,17 +134,20 @@ footer {
     opacity: 0;
   }
 }
-/* Link in rockets*/
+/* Link in rocket*/
 .floating-rocket {
   position: absolute;
   bottom: -5%;
   left: 70%;
   animation: floatRocket 18s linear infinite;
+  animation-fill-mode: none; /* <-- THIS IS CRITICAL */
   font-size: 2rem;
   opacity: 0.4;
   z-index: 10;
   pointer-events: auto; /* enable clicking */
+  will-change: transform, opacity;
 }
+
 
 .floating-rocket:hover {
   opacity: 1;
