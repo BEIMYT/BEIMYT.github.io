@@ -144,7 +144,7 @@ footer {
 .floating-rocket {
   position: absolute;
   bottom: 0%;
-  left: 60%;
+  left: 40%;
   animation: floatRocket 18s linear infinite;
   animation-fill-mode: none; 
   font-size: 2rem;
