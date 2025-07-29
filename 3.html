@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!--------->
+ <script>
+    // Prompt for password when page loads
+    var password = prompt("Enter the password to access this page:");
+    
+    // If password is wrong, redirect or close the tab
+    if (password !== "amea") {
+      alert("Wrong password!");
+      window.location.href = "https://beim.space"; // or another page
+    }
+  </script>
+    <!--------->
     <meta charset="utf-8">
     <title>beim.space(secret)</title>
   </head>
