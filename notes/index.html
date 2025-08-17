@@ -1,23 +1,110 @@
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes - beim.space</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #0f2027;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    textarea {
+      width: 80%;
+      height: 100px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #1abc9c;
+      color: white;
+    }
+    .notes {
+      margin-top: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+    .note {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Leave a Note ✍️</h1>
+  <textarea id="noteInput" placeholder="Write something..."></textarea><br>
+  <button id="saveNote">Save Note</button>
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
-    authDomain: "beim-notes.firebaseapp.com",
-    projectId: "beim-notes",
-    storageBucket: "beim-notes.firebasestorage.app",
-    messagingSenderId: "861389311161",
-    appId: "1:861389311161:web:8d47e467a276f6a1e09f68",
-    measurementId: "G-4PKVYPG2JS"
-  };
+  <div class="notes" id="notesList"></div>
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+  <script type="module">
+    // Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
+      authDomain: "beim-notes.firebaseapp.com",
+      projectId: "beim-notes",
+      storageBucket: "beim-notes.appspot.com",
+      messagingSenderId: "861389311161",
+      appId: "1:861389311161:web:8d47e467a276f6a1e09f68",
+      measurementId: "G-4PKVYPG2JS"
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const noteInput = document.getElementById("noteInput");
+    const saveButton = document.getElementById("saveNote");
+    const notesList = document.getElementById("notesList");
+
+    // Save new note
+    saveButton.addEventListener("click", async () => {
+      const text = noteInput.value.trim();
+      if (text) {
+        await addDoc(collection(db, "notes"), {
+          text: text,
+          timestamp: serverTimestamp()
+        });
+        noteInput.value = "";
+        loadNotes();
+      }
+    });
+
+    // Load all notes
+    async function loadNotes() {
+      notesList.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "notes"));
+      querySnapshot.forEach((doc) => {
+        const div = document.createElement("div");
+        div.classList.add("note");
+        div.textContent = doc.data().text;
+        notesList.appendChild(div);
+      });
+    }
+
+    loadNotes();
+  </script>
+</body>
+</html>
