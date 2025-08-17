@@ -1,110 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notes - beim.space</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #0f2027;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-    textarea {
-      width: 80%;
-      height: 100px;
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #1abc9c;
-      color: white;
-    }
-    .notes {
-      margin-top: 30px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: left;
-    }
-    .note {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Leave a Note ✍️</h1>
-  <textarea id="noteInput" placeholder="Write something..."></textarea><br>
-  <button id="saveNote">Save Note</button>
-
-  <div class="notes" id="notesList"></div>
-
+  <meta charset="UTF-8">
+  <title>Notes Wall</title>
   <script type="module">
-    // Firebase imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, startAfter } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-    // Your Firebase config
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
       authDomain: "beim-notes.firebaseapp.com",
       projectId: "beim-notes",
-      storageBucket: "beim-notes.appspot.com",
+      storageBucket: "beim-notes.firebasestorage.app",
       messagingSenderId: "861389311161",
       appId: "1:861389311161:web:8d47e467a276f6a1e09f68",
       measurementId: "G-4PKVYPG2JS"
     };
 
-    // Init Firebase
+    // Init Firebase + Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const noteInput = document.getElementById("noteInput");
-    const saveButton = document.getElementById("saveNote");
+    // DOM refs
     const notesList = document.getElementById("notesList");
+    const noteForm = document.getElementById("noteForm");
+    const noteInput = document.getElementById("noteInput");
+    const loadMoreBtn = document.getElementById("loadMore");
 
-    // Save new note
-    saveButton.addEventListener("click", async () => {
+    let lastVisible = null;
+    const notesPerPage = 5;
+
+    // Add a new note
+    noteForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
       const text = noteInput.value.trim();
-      if (text) {
-        await addDoc(collection(db, "notes"), {
-          text: text,
-          timestamp: serverTimestamp()
-        });
-        noteInput.value = "";
-        loadNotes();
-      }
+      if (!text) return;
+
+      await addDoc(collection(db, "notes"), {
+        text: text,
+        createdAt: new Date()
+      });
+
+      noteInput.value = "";
+      notesList.innerHTML = ""; // clear
+      lastVisible = null;       // reset
+      loadNotes();              // reload fresh
     });
 
-    // Load all notes
+    // Load notes with pagination
     async function loadNotes() {
-      notesList.innerHTML = "";
-      const querySnapshot = await getDocs(collection(db, "notes"));
-      querySnapshot.forEach((doc) => {
-        const div = document.createElement("div");
-        div.classList.add("note");
-        div.textContent = doc.data().text;
-        notesList.appendChild(div);
-      });
+      let q;
+      if (lastVisible) {
+        q = query(
+          collection(db, "notes"),
+          orderBy("createdAt", "desc"),
+          startAfter(lastVisible),
+          limit(notesPerPage)
+        );
+      } else {
+        q = query(
+          collection(db, "notes"),
+          orderBy("createdAt", "desc"),
+          limit(notesPerPage)
+        );
+      }
+
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        snap.forEach(doc => {
+          const li = document.createElement("li");
+          li.textContent = doc.data().text;
+          notesList.appendChild(li);
+        });
+        lastVisible = snap.docs[snap.docs.length - 1];
+      } else {
+        loadMoreBtn.style.display = "none"; // hide button if no more notes
+      }
     }
 
+    // "Load More" click
+    loadMoreBtn.addEventListener("click", loadNotes);
+
+    // Initial load
     loadNotes();
   </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      text-align: center;
+      padding: 20px;
+    }
+    #noteForm {
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 10px;
+      width: 60%;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background: orange;
+      color: #111;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #222;
+      padding: 10px;
+      margin: 5px auto;
+      border-radius: 5px;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Leave a Note ✍️</h1><br><h3>I know that spamming is fun, but please dont!</h3>
+
+  <form id="noteForm">
+    <input type="text" id="noteInput" placeholder="Write your note..." required>
+    <button type="submit">Post</button>
+  </form>
+
+  <ul id="notesList"></ul>
+  <button id="loadMore">Load More</button>
 </body>
 </html>
