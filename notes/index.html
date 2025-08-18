@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Notes Wall</title>
@@ -19,6 +20,14 @@
       measurementId: "G-4PKVYPG2JS"
     };
 
+    const app = initializeApp(firebaseConfig);
+
+  // 
+  const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider("6LcD9akrAAAAAH5oXaQ02OmahqwlylGowDuZsuHx"),
+    isTokenAutoRefreshEnabled: true
+  });
+    
     // Init Firebase + Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
