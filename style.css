@@ -161,3 +161,13 @@ footer {
   transition: 0.3s ease;
 }
 
+/* Notes styling */
+.note {
+  white-space: nowrap;      /* keep on one line */
+  overflow: hidden;         /* hide extra text */
+  text-overflow: ellipsis;  /* show "..." */
+  display: block;
+  max-width: 100%;
+  cursor: pointer;          /* makes it obvious you can click */
+}
+
