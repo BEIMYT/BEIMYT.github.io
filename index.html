@@ -21,6 +21,16 @@
 </head>
 <body>
 
+   <nav class="fixed-nav">
+  <button class="dropbtn">Menu ▾</button>
+  <div class="dropdown-content">
+    <a href="https://beim.space/notes">Notes Wall</a>
+    <a href="https://beim.space/minigame">MiniGame</a>
+    <a href="https://ddnet.org/players/-9883-Ikaroaroaro/" target="_blank">DDNet Profile</a>
+    <a href="https://discord.gg/VNcE4adTKz" target="_blank">Discord</a>
+  </div>
+</nav>
+
   <div id="tsparticles"></div>
 <div class="floating-icons">
   <span>🪐</span>
@@ -122,5 +132,19 @@
   });
 </script>
 <!---------------------->
+
+   <script>
+  document.querySelector(".dropbtn").addEventListener("click", function() {
+    document.querySelector(".fixed-nav").classList.toggle("active");
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function(e) {
+    if (!e.target.closest(".fixed-nav")) {
+      document.querySelector(".fixed-nav").classList.remove("active");
+    }
+  });
+</script>
+
 </body>
 </html>
