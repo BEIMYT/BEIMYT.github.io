@@ -241,3 +241,52 @@ section.active {
   background-color: rgba(255, 255, 255, 0.1);  /* brighter */
   box-shadow: 0 0 25px rgba(0, 255, 255, 0.4); /* cyan glow */
 }
+/*HOVER THING & MENU THING*/
+/* --- Links --- */
+a {
+  color: #00d4ff;
+  text-decoration: none;
+  font-weight: bold;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+a::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: -3px;
+  background: #00ffee;
+  transition: width 0.3s ease;
+}
+
+a:hover {
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee, 0 0 16px #00ffee;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* --- Buttons (Menu, etc.) --- */
+.dropbtn {
+  background-color: #203a43;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
+}
+
+.dropbtn:hover {
+  background-color: #2c5364;
+  transform: scale(1.08);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
+}
