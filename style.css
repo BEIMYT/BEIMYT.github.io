@@ -74,6 +74,8 @@ footer {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100vw;   /* full viewport width */
+  height: 100vh;  /* full viewport height */
   pointer-events: none;
   z-index: 0;
 }
@@ -85,7 +87,7 @@ footer {
   opacity: 0.4;
 }
 
-/* Random starting positions and speeds */
+/* Keep your specific positions for each child */
 .floating-icons span:nth-child(1) {
   top: 10%;
   left: 20%;
@@ -143,17 +145,15 @@ footer {
 /* Link in rocket*/
 .floating-rocket {
   position: absolute;
-  bottom: 20%;
+  top: 80%;        /* changed from bottom:20% */
   left: 10%;
   animation: floatRocket 18s linear infinite;
-  animation-fill-mode: none; 
   font-size: 2rem;
   opacity: 0.4;
   z-index: 10;
-  pointer-events: auto; /* enable clicking */
+  pointer-events: auto;
   will-change: transform, opacity;
 }
-
 
 .floating-rocket:hover {
   opacity: 1;
