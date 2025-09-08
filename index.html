@@ -147,21 +147,37 @@
 <!------------------->
    <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const sections = document.querySelectorAll("section");
+    const sections = document.querySelectorAll("main section");
 
-    const observer = new IntersectionObserver((entries) => {
+    function applyActive(entries) {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("active");
-        } else {
-          entry.target.classList.remove("active");
-        }
+        entry.target.classList.toggle(
+          "active",
+          entry.isIntersecting && entry.intersectionRatio > 0.25
+        );
       });
-    }, { threshold: 0.5 }); // triggers when 50% of section is visible
+    }
 
-    sections.forEach(section => {
-      observer.observe(section);
-    });
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(applyActive, {
+        threshold: [0, 0.25, 0.5],
+        rootMargin: "-10% 0px -40% 0px"
+      });
+      sections.forEach(s => observer.observe(s));
+    } else {
+      // Fallback for very old browsers
+      const onScroll = () => {
+        const vh = window.innerHeight;
+        sections.forEach(s => {
+          const r = s.getBoundingClientRect();
+          const visible = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+          const ratio = visible / Math.max(1, r.height);
+          s.classList.toggle("active", ratio > 0.25);
+        });
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
   });
 </script>
 
