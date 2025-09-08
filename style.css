@@ -228,3 +228,17 @@ footer {
 .fixed-nav.active .dropdown-content {
   display: block;
 }
+
+/* Default state */
+section {
+  transition: background-color 0.5s ease, box-shadow 0.5s ease;
+  border-radius: 12px;
+  padding: 1em;
+  margin: 1.5em 0;
+}
+
+/* Active (when scrolled into view) */
+section.active {
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
