@@ -35,3 +35,18 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.columns {
+  display: flex;
+  gap: 20px;               /* space between left and right */
+  justify-content: center; /* center the whole thing */
+  margin: 30px auto;
+  max-width: 900px;        /* keeps it neat */
+}
+
+.column {
+  flex: 1;                       /* equal width */
+  background-color: rgba(0,0,0,0.4);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
