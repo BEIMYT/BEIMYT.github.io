@@ -291,9 +291,9 @@ a:hover::after {
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
 }
 
-/*DISCORD*/
+/* --- Discord Button Wrapper --- */
 .discord-btn {
   display: flex;
-  justify-content: center;
-  margin: 20px 0; /* space above and below */
+  justify-content: center; /* centers it horizontally */
+  margin: 20px 0; /* spacing above and below */
 }
