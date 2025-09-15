@@ -290,3 +290,10 @@ a:hover::after {
   transform: scale(1.08);
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
 }
+
+/*DISCORD*/
+.discord-btn {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0; /* space above and below */
+}
