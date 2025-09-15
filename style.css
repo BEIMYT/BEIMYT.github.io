@@ -427,3 +427,20 @@ a:hover::after {
   margin: 20px 0; /* spacing above & below */
   width: 100%;
 }
+
+/* Always center the Discord icon */
+.layer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.layer span.fab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border-radius: 5px;
+}
