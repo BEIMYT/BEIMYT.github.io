@@ -290,10 +290,140 @@ a:hover::after {
   transform: scale(1.08);
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
 }
+/*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA*/
+/*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA*/
+/* --- Discord tooltip (Uiverse) + center fix --- */
+/* make the tooltip container shrink to content so centering works */
+.discord-btn .tooltip-container {
+  display: inline-block;   /* <--- critical fix */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 17px;
+  border-radius: 10px;
+}
 
-/* --- Discord Button Wrapper --- */
+/* tooltip card */
+.discord-btn .tooltip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  border-radius: 15px;
+  box-shadow:
+    inset 5px 5px 5px rgba(0, 0, 0, 0.2),
+    inset -5px -5px 15px rgba(255, 255, 255, 0.1),
+    5px 5px 15px rgba(0, 0, 0, 0.3),
+    -5px -5px 15px rgba(255, 255, 255, 0.1);
+}
+
+/* profile inside tooltip */
+.discord-btn .profile {
+  background: #2a2b2f;
+  border-radius: 10px 15px;
+  padding: 10px;
+  border: 1px solid #5865f2;
+}
+
+/* show the tooltip on hover */
+.discord-btn .tooltip-container:hover .tooltip {
+  top: -150px;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* the clickable icon */
+.discord-btn .icon {
+  text-decoration: none;
+  color: #fff;
+  display: block;
+  position: relative;
+}
+
+/* the layered square around icon */
+.discord-btn .layer {
+  width: 55px;
+  height: 55px;
+  transition: transform 0.3s;
+  position: relative;
+}
+.discord-btn .icon:hover .layer {
+  transform: rotate(-35deg) skew(20deg);
+}
+.discord-btn .layer span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+
+.discord-btn .layer span,
+.discord-btn .text {
+  color: #5865f2;
+  border-color: #5865f2;
+}
+
+/* small effects when hovering */
+.discord-btn .icon:hover .layer span:nth-child(1) { opacity: 0.2; }
+.discord-btn .icon:hover .layer span:nth-child(2) { opacity: 0.4; transform: translate(5px, -5px); }
+.discord-btn .icon:hover .layer span:nth-child(3) { opacity: 0.6; transform: translate(10px, -10px); }
+.discord-btn .icon:hover .layer span:nth-child(4) { opacity: 0.8; transform: translate(15px, -15px); }
+.discord-btn .icon:hover .layer span:nth-child(5) { opacity: 1; transform: translate(20px, -20px); }
+
+.discord-btn .layer span.fab {
+  font-size: 30px;
+  line-height: 64px;
+  text-align: center;
+  fill: #5865f2;
+  background: #000;
+}
+
+/* user/profile pieces */
+.discord-btn .user {
+  display: flex;
+  gap: 10px;
+}
+.discord-btn .img {
+  width: 50px;
+  height: 50px;
+  font-size: 25px;
+  font-weight: 700;
+  border: 1px solid #5865f2;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+.discord-btn .name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #5865f2;
+}
+.discord-btn .details {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: #fff;
+}
+.discord-btn .about {
+  color: #ccc;
+  padding-top: 5px;
+}
+
+/* wrapper to center it above the footer */
 .discord-btn {
   display: flex;
-  justify-content: center; /* centers it horizontally */
-  margin: 20px 0; /* spacing above and below */
+  justify-content: center; /* centers horizontally */
+  margin: 20px 0; /* spacing above & below */
+  width: 100%;
 }
