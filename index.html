@@ -180,6 +180,54 @@
     }
   });
 </script>
+
    
+   <script>
+document.addEventListener("DOMContentLoaded", () => {
+  let buffer = "";
+
+  document.addEventListener("keydown", (e) => {
+    buffer += e.key.toLowerCase();
+
+    // Keep only last 10 characters
+    if (buffer.length > 10) buffer = buffer.slice(-10);
+
+    if (buffer.includes("beim")) {
+      triggerBeimAnimation();
+      buffer = ""; // reset so it doesn’t keep triggering
+    }
+  });
+
+  function triggerBeimAnimation() {
+    // Create floating text/emoji
+    const elem = document.createElement("div");
+    elem.textContent = "🚀 BEIM!";
+    elem.style.position = "fixed";
+    elem.style.left = "50%";
+    elem.style.top = "50%";
+    elem.style.transform = "translate(-50%, -50%) scale(0.5)";
+    elem.style.fontSize = "2rem";
+    elem.style.fontWeight = "bold";
+    elem.style.color = "#00ffee";
+    elem.style.textShadow = "0 0 10px #00ffee, 0 0 20px #00ffff";
+    elem.style.zIndex = "2000";
+    elem.style.pointerEvents = "none";
+    elem.style.opacity = "1";
+    elem.style.transition = "transform 1s ease, opacity 1.2s ease";
+
+    document.body.appendChild(elem);
+
+    // Animate it
+    setTimeout(() => {
+      elem.style.transform = "translate(-50%, -200%) scale(1.5)";
+      elem.style.opacity = "0";
+    }, 50);
+
+    // Remove after animation
+    setTimeout(() => elem.remove(), 1500);
+  }
+});
+</script>
+
 </body>
 </html>
