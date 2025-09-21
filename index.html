@@ -66,8 +66,7 @@
     </section>
      <section>
         <h2>Latest update included:</h2>
-        <p>• "Glossa" added at the menu  <br>
-        <p>• Added fancier animations <br>
+        <p>• Easter egg added :)  <br>
         <h4><i>You can check the progress <a href= "https://github.com/BEIMYT/BEIMYT.github.io" target="_blank">here</a></i></h4>
         
      </section>
@@ -75,7 +74,7 @@
 
   <footer>
     <p>&copy; 2025-2026 BEIM</p>
-    <p><h5>Last updated: 11/9/2025</h5></p>
+    <p><h5>Last updated: 21/9/2025</h5></p>
     <p><h6>Running since: 27/7/2025</h6></p>
   </footer>
 <!---------------------->
@@ -186,20 +185,36 @@
   document.addEventListener("DOMContentLoaded", () => {
     let buffer = "";
 
-    // === Trigger function (same for both cases) ===
+    // === Trigger function ===
     function triggerBeimAnimation() {
-      const elem = document.createElement("div");
-      elem.textContent = "🚀 BEIM!";
-      elem.style.position = "fixed";
-      elem.style.left = Math.random() * 80 + "%";
-      elem.style.top = "80%";
-      elem.style.fontSize = "2rem";
-      elem.style.color = "#00ffee";
-      elem.style.textShadow = "0 0 10px #00ffee, 0 0 20px #00ffee";
-      elem.style.animation = "flyUp 2s ease-out forwards";
-      document.body.appendChild(elem);
+      // Wrapper for both image + text
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "fixed";
+      wrapper.style.left = Math.random() * 80 + "%";
+      wrapper.style.top = "80%";
+      wrapper.style.textAlign = "center";
+      wrapper.style.animation = "flyUp 2s ease-out forwards";
 
-      setTimeout(() => elem.remove(), 2000);
+      // Image
+      const img = document.createElement("img");
+      img.src = "favicon.png"; // <-- replace with your image path
+      img.style.width = "50px";   // adjust size
+      img.style.display = "block";
+      img.style.margin = "0 auto 5px auto";
+
+      // Text
+      const text = document.createElement("div");
+      text.textContent = "🚀 BEIM!";
+      text.style.fontSize = "2rem";
+      text.style.color = "#00ffee";
+      text.style.textShadow = "0 0 10px #00ffee, 0 0 20px #00ffee";
+
+      // Put them together
+      wrapper.appendChild(img);
+      wrapper.appendChild(text);
+      document.body.appendChild(wrapper);
+
+      setTimeout(() => wrapper.remove(), 2000);
     }
 
     // === Keyboard trigger (desktop/laptop) ===
@@ -209,7 +224,7 @@
         triggerBeimAnimation();
         buffer = ""; // reset
       }
-      if (buffer.length > 10) buffer = buffer.slice(-10); // avoid growing too long
+      if (buffer.length > 10) buffer = buffer.slice(-10);
     });
 
     // === Multi-touch trigger (mobile: 3 fingers) ===
