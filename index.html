@@ -254,8 +254,8 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const aboutSection = document.querySelector("#about");
-  const flagContainer = aboutSection.querySelector(".flag-container");
+  const aboutSection = document.querySelector("#about-me"); // ✅ correct ID
+  const flagContainer = document.querySelector(".flag-container");
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -267,7 +267,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }, { threshold: 0.5 });
 
-  observer.observe(aboutSection);
+  if (aboutSection) {
+    observer.observe(aboutSection);
+  }
 });
 </script>
 
