@@ -272,6 +272,47 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
+// shooting stars!
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  let lastScrollY = window.scrollY;
+  let lastTime = Date.now();
+
+  // Possible star colors
+  const colors = ["#00ffee", "#ff00ff", "#ffd700", "#00d4ff", "#ff69b4", "#ffffff"];
+
+  window.addEventListener("scroll", () => {
+    const now = Date.now();
+    const deltaY = Math.abs(window.scrollY - lastScrollY);
+    const deltaT = now - lastTime;
+
+    // Calculate scroll "speed"
+    const speed = deltaY / Math.max(1, deltaT);
+
+    // If scrolling fast enough, spawn a shooting star
+    if (speed > 0.5) {
+      const star = document.createElement("div");
+      star.className = "shooting-star";
+
+      // Random color
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      star.style.background = `linear-gradient(${color}, transparent)`;
+
+      // Random starting position
+      star.style.top = Math.random() * window.innerHeight * 0.7 + "px";
+      star.style.left = Math.random() * window.innerWidth * 0.7 + "px";
+
+      document.body.appendChild(star);
+
+      // Remove after animation
+      setTimeout(() => star.remove(), 800);
+    }
+
+    lastScrollY = window.scrollY;
+    lastTime = now;
+  }, { passive: true });
+});
+</script>
 
 </body>
 </html>
