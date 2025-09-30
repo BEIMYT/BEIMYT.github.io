@@ -252,5 +252,24 @@
   });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const aboutSection = document.querySelector("#about");
+  const flagContainer = aboutSection.querySelector(".flag-container");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        flagContainer.classList.add("visible");
+      } else {
+        flagContainer.classList.remove("visible");
+      }
+    });
+  }, { threshold: 0.5 });
+
+  observer.observe(aboutSection);
+});
+</script>
+
 </body>
 </html>
