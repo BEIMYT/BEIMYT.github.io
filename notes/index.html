@@ -33,22 +33,44 @@
     let lastVisible = null;
     const notesPerPage = 5;
 
-    // Add a new note
-    noteForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const text = noteInput.value.trim();
-      if (!text) return;
+    // Add a new note (with cooldown)
+noteForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      await addDoc(collection(db, "notes"), {
-        text: text,
-        createdAt: new Date()
-      });
+  const text = noteInput.value.trim();
+  if (!text) return;
 
-      noteInput.value = "";
-      notesList.innerHTML = ""; // clear
-      lastVisible = null;       // reset
-      loadNotes();              // reload fresh
+  const lastPostTime = localStorage.getItem("lastPostTime");
+  const now = Date.now();
+  const cooldown = 30 * 1000; // 30 seconds in ms
+
+  // Check if still in cooldown
+  if (lastPostTime && now - lastPostTime < cooldown) {
+    const remaining = Math.ceil((cooldown - (now - lastPostTime)) / 1000);
+    alert(`⏳ Please wait ${remaining} seconds before posting again.`);
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "notes"), {
+      text: text,
+      createdAt: new Date()
     });
+
+    // Save timestamp locally
+    localStorage.setItem("lastPostTime", now);
+
+    noteInput.value = "";
+    notesList.innerHTML = "";
+    lastVisible = null;
+    loadNotes();
+  } catch (error) {
+    console.error("Error adding note:", error);
+    alert("Something went wrong while posting your note!");
+    noteForm.querySelector("button").disabled = true;
+setTimeout(() => noteForm.querySelector("button").disabled = false, cooldown);
+  }
+});
 
     // Load notes with pagination
     async function loadNotes() {
