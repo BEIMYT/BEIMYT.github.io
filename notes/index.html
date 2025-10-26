@@ -33,7 +33,7 @@
     let lastVisible = null;
     const notesPerPage = 5;
 
-    // Add a new note (with cooldown)
+    // Add a new note (with cooldown + timer)
 noteForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -42,12 +42,15 @@ noteForm.addEventListener("submit", async (e) => {
 
   const lastPostTime = localStorage.getItem("lastPostTime");
   const now = Date.now();
-  const cooldown = 30 * 1000; // 30 seconds in ms
+  const cooldown = 30 * 1000; // 30 seconds
+  const cooldownTimer = document.getElementById("cooldownTimer");
+  const postButton = noteForm.querySelector("button");
 
-  // Check if still in cooldown
+  // If still cooling down
   if (lastPostTime && now - lastPostTime < cooldown) {
     const remaining = Math.ceil((cooldown - (now - lastPostTime)) / 1000);
     alert(`⏳ Please wait ${remaining} seconds before posting again.`);
+    startCountdown(remaining);
     return;
   }
 
@@ -57,18 +60,36 @@ noteForm.addEventListener("submit", async (e) => {
       createdAt: new Date()
     });
 
-    // Save timestamp locally
     localStorage.setItem("lastPostTime", now);
-
     noteInput.value = "";
     notesList.innerHTML = "";
     lastVisible = null;
     loadNotes();
+
+    // Start cooldown display
+    startCountdown(cooldown / 1000);
   } catch (error) {
     console.error("Error adding note:", error);
     alert("Something went wrong while posting your note!");
-    noteForm.querySelector("button").disabled = true;
-setTimeout(() => noteForm.querySelector("button").disabled = false, cooldown);
+  }
+
+  // === Function: countdown display ===
+  function startCountdown(seconds) {
+    postButton.disabled = true;
+    let timeLeft = seconds;
+
+    cooldownTimer.textContent = `Wait: ${timeLeft}s`;
+
+    const interval = setInterval(() => {
+      timeLeft--;
+      cooldownTimer.textContent = `Wait: ${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        cooldownTimer.textContent = "";
+        postButton.disabled = false;
+      }
+    }, 1000);
   }
 });
 
@@ -152,9 +173,11 @@ setTimeout(() => noteForm.querySelector("button").disabled = false, cooldown);
   <h1>Leave a Note ✍️</h1> <br><h3>I know that spamming is fun, but please dont!</h3>
 
   <form id="noteForm">
-    <input type="text" id="noteInput" placeholder="Write your Note..." required maxlength="25">
-    <button type="submit">Post</button>
-  </form>
+  <input type="text" id="noteInput" placeholder="Write your Note..." required maxlength="25">
+  <button type="submit">Post</button>
+  <span id="cooldownTimer" style="margin-left: 10px; color: orange; font-weight: bold;"></span>
+</form>
+
 <br><h5>By posting a Note you agree to the <a href="https://www.beim.space/notes/ToS.html">ToS</a></h2>
   <ul id="notesList"></ul>
   <button id="loadMore">Load More</button>
