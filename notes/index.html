@@ -48,22 +48,36 @@ noteForm.addEventListener("submit", async (e) => {
 
   // === Function: countdown display ===
   function startCountdown(seconds) {
-    postButton.disabled = true;
-    let timeLeft = seconds;
+  postButton.disabled = true;
+  let timeLeft = seconds;
 
+  const updateColor = (remaining) => {
+    const ratio = remaining / seconds;
+    if (ratio > 0.66) {
+      cooldownTimer.style.color = "red";      // start of cooldown
+    } else if (ratio > 0.33) {
+      cooldownTimer.style.color = "orange";   // mid cooldown
+    } else {
+      cooldownTimer.style.color = "limegreen"; // almost ready
+    }
+  };
+
+  updateColor(timeLeft);
+  cooldownTimer.textContent = `Wait: ${timeLeft}s`;
+
+  const interval = setInterval(() => {
+    timeLeft--;
     cooldownTimer.textContent = `Wait: ${timeLeft}s`;
+    updateColor(timeLeft);
 
-    const interval = setInterval(() => {
-      timeLeft--;
-      cooldownTimer.textContent = `Wait: ${timeLeft}s`;
-
-      if (timeLeft <= 0) {
-        clearInterval(interval);
-        cooldownTimer.textContent = "";
-        postButton.disabled = false;
-      }
-    }, 1000);
-  }
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      cooldownTimer.textContent = "";
+      cooldownTimer.style.color = "orange"; // reset
+      postButton.disabled = false;
+    }
+  }, 1000);
+}
 
   // If still cooling down
   if (lastPostTime && now - lastPostTime < cooldown) {
@@ -167,6 +181,20 @@ noteForm.addEventListener("submit", async (e) => {
       border-radius: 5px;
       max-width: 400px;
     }
+
+    /* === Cooldown timer animation === */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+#cooldownTimer {
+  animation: pulse 1s infinite;
+  font-weight: bold;
+  margin-left: 10px;
+  transition: color 0.5s ease;
+}
+
   </style>
 </head>
 <body>
