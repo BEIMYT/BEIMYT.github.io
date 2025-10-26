@@ -33,7 +33,7 @@
     let lastVisible = null;
     const notesPerPage = 5;
 
-    // Add a new note (with cooldown + timer)
+   // Add a new note (with cooldown + timer + alert)
 noteForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -45,6 +45,25 @@ noteForm.addEventListener("submit", async (e) => {
   const cooldown = 30 * 1000; // 30 seconds
   const cooldownTimer = document.getElementById("cooldownTimer");
   const postButton = noteForm.querySelector("button");
+
+  // === Function: countdown display ===
+  function startCountdown(seconds) {
+    postButton.disabled = true;
+    let timeLeft = seconds;
+
+    cooldownTimer.textContent = `Wait: ${timeLeft}s`;
+
+    const interval = setInterval(() => {
+      timeLeft--;
+      cooldownTimer.textContent = `Wait: ${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        cooldownTimer.textContent = "";
+        postButton.disabled = false;
+      }
+    }, 1000);
+  }
 
   // If still cooling down
   if (lastPostTime && now - lastPostTime < cooldown) {
@@ -66,30 +85,11 @@ noteForm.addEventListener("submit", async (e) => {
     lastVisible = null;
     loadNotes();
 
-    // Start cooldown display
+    // Start cooldown display after successful post
     startCountdown(cooldown / 1000);
   } catch (error) {
     console.error("Error adding note:", error);
     alert("Something went wrong while posting your note!");
-  }
-
-  // === Function: countdown display ===
-  function startCountdown(seconds) {
-    postButton.disabled = true;
-    let timeLeft = seconds;
-
-    cooldownTimer.textContent = `Wait: ${timeLeft}s`;
-
-    const interval = setInterval(() => {
-      timeLeft--;
-      cooldownTimer.textContent = `Wait: ${timeLeft}s`;
-
-      if (timeLeft <= 0) {
-        clearInterval(interval);
-        cooldownTimer.textContent = "";
-        postButton.disabled = false;
-      }
-    }, 1000);
   }
 });
 
