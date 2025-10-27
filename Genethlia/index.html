@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Αντίστροφη μέτρηση🎂</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden; /* 🔒 No scrolling */
+    }
+    body {
+      font-family: "Poppins", system-ui, sans-serif;
+      background: radial-gradient(circle at bottom, #0f2027, #203a43, #2c5364);
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      user-select: none;
+    }
+    h1 {
+      font-size: 2.4rem;
+      margin: 0 0.25rem;
+      color: orange;
+      text-shadow: 0 0 14px orange;
+    }
+    h2 {
+      color: #bdbdbd;
+      margin: 8px 0 28px;
+      font-weight: 400;
+    }
+    #countdown {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #00ffaa;
+      text-shadow: 0 0 10px #00ffaa;
+      margin-bottom: 14px;
+    }
+    .emoji {
+      font-size: 3.2rem;
+      margin-top: 8px;
+      animation: float 2s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) }
+      50% { transform: translateY(-10px) }
+    }
+    footer {
+      position: fixed;
+      bottom: 12px;
+      width: 100%;
+      text-align: center;
+      color: #999;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 540px) {
+      h1 { font-size: 1.8rem }
+      #countdown { font-size: 1.4rem }
+    }
+    canvas#confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <h1>🎉Αντίστροφη μέτρηση για τα γενέθλια μου!🎉</h1>
+  <h2>8 Νοεμβρίου στο Τρίγωνο — Στις 7:30!</h2>
+
+  <div id="countdown">Loading...</div>
+  <div class="emoji" id="emoji">⏳</div>
+
+  <footer>Made with 💛 by BEIM</footer>
+
+  <script>
+    (function() {
+      const B_MONTH = 11; // November
+      const B_DAY = 8;
+      const countdownEl = document.getElementById('countdown');
+      const emojiEl = document.getElementById('emoji');
+      const canvas = document.getElementById("confetti");
+      const ctx = canvas.getContext("2d");
+
+      // 🎉 Confetti setup
+      let confetti = [];
+      const colors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93"];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      function createConfetti() {
+        for (let i = 0; i < 150; i++) {
+          confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            r: Math.random() * 6 + 2,
+            c: colors[Math.floor(Math.random() * colors.length)],
+            s: Math.random() * 3 + 1,
+          });
+        }
+      }
+
+      function drawConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.c;
+          ctx.fill();
+        });
+        updateConfetti();
+      }
+
+      function updateConfetti() {
+        confetti.forEach(p => {
+          p.y += p.s;
+          if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      function animateConfetti() {
+        drawConfetti();
+        requestAnimationFrame(animateConfetti);
+      }
+
+      let confettiActive = false;
+      function startConfetti() {
+        if (!confettiActive) {
+          createConfetti();
+          animateConfetti();
+          confettiActive = true;
+        }
+      }
+
+      function birthdayDateForYear(year) {
+        return new Date(year, B_MONTH - 1, B_DAY, 0, 0, 0, 0);
+      }
+
+      function update() {
+        const now = new Date();
+        const thisYear = now.getFullYear();
+
+        let target = birthdayDateForYear(thisYear);
+        const startOfBirthday = birthdayDateForYear(thisYear);
+        const endOfBirthday = new Date(startOfBirthday.getTime() + 24*60*60*1000 - 1);
+
+        // 🎂 It’s your birthday!
+        if (now >= startOfBirthday && now <= endOfBirthday) {
+          countdownEl.textContent = "🎉 See you next year!";
+          countdownEl.style.color = "orange";
+          countdownEl.style.textShadow = "0 0 15px orange, 0 0 30px #ff8c00";
+          emojiEl.textContent = "🥳";
+          startConfetti();
+          return;
+        }
+
+        // Target date (this year or next)
+        if (now > endOfBirthday) target = birthdayDateForYear(thisYear + 1);
+
+        const diff = target.getTime() - now.getTime();
+        if (diff <= 0) return;
+
+        const days = Math.floor(diff / (1000*60*60*24));
+        const hours = Math.floor((diff / (1000*60*60)) % 24);
+        const minutes = Math.floor((diff / (1000*60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+        if (days < 1) countdownEl.style.color = "#ff4b4b";
+        else if (days < 7) countdownEl.style.color = "#ffae00";
+        else countdownEl.style.color = "#00ffaa";
+
+        emojiEl.textContent = "⏳";
+      }
+
+      update();
+      setInterval(update, 1000);
+    })();
+  </script>
+</body>
+</html>
