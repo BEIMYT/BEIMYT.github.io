@@ -16,6 +16,20 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notes Wall</title>
   <script type="module">
+    // === Custom popup function ===
+function showPopup(message) {
+  const popup = document.getElementById("popup");
+  const popupMessage = document.getElementById("popupMessage");
+  const popupClose = document.getElementById("popupClose");
+
+  popupMessage.textContent = message;
+  popup.classList.add("active");
+
+  const closePopup = () => popup.classList.remove("active");
+  popupClose.onclick = closePopup;
+  popup.onclick = (e) => { if (e.target === popup) closePopup(); };
+}
+
     // Import Firebase SDKs
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, startAfter } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
@@ -92,11 +106,11 @@ noteForm.addEventListener("submit", async (e) => {
 
   // If still cooling down
   if (lastPostTime && now - lastPostTime < cooldown) {
-    const remaining = Math.ceil((cooldown - (now - lastPostTime)) / 1000);
-    alert(`⏳ Please wait ${remaining} seconds before posting again.`);
-    startCountdown(remaining);
-    return;
-  }
+  const remaining = Math.ceil((cooldown - (now - lastPostTime)) / 1000);
+  showPopup(`⏳ Please wait ${remaining} seconds before posting again.`);
+  startCountdown(remaining);
+  return;
+}
 
   try {
     await addDoc(collection(db, "notes"), {
@@ -206,6 +220,63 @@ noteForm.addEventListener("submit", async (e) => {
   transition: color 0.5s ease;
 }
 
+    /* === Custom Popup === */
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+.popup-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.popup-box {
+  background: #1c1c1c;
+  color: #fff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(255, 165, 0, 0.4);
+  text-align: center;
+  max-width: 300px;
+  animation: popIn 0.3s ease;
+}
+
+.popup-box h3 {
+  color: orange;
+  margin-bottom: 10px;
+}
+
+.popup-box button {
+  margin-top: 15px;
+  background: orange;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #111;
+  transition: background 0.2s;
+}
+
+.popup-box button:hover {
+  background: #ffb84d;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
   </style>
 </head>
 <body>
@@ -241,6 +312,15 @@ noteForm.addEventListener("submit", async (e) => {
     }
   });
 </script>
+  
+<!-- Popup structure -->
+<div id="popup" class="popup-overlay">
+  <div class="popup-box">
+    <h3>⏳ Cooldown Active</h3>
+    <p id="popupMessage">Please wait a few seconds before posting again.</p>
+    <button id="popupClose">OK</button>
+  </div>
+</div>
 
 </body>
 </html>
