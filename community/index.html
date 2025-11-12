@@ -49,6 +49,18 @@
     let cooldown = false;
     let cooldownTimer = null;
 
+    // Always show ToS modal on every visit/refresh
+    function showTOSModal(thenShowChat) {
+      tosOverlay.style.display = "flex";
+      tosModal.style.display = "flex";
+      tosAcknowledgeBtn.focus();
+      tosAcknowledgeBtn.onclick = () => {
+        tosOverlay.style.display = "none";
+        tosModal.style.display = "none";
+        if (typeof thenShowChat === "function") thenShowChat();
+      };
+    }
+
     // Toggle login/register
     toggleMode.addEventListener("click", () => {
       isLoginMode = !isLoginMode;
@@ -62,23 +74,6 @@
     // Hash passwords (simple client-side)
     function hashPassword(str) {
       return btoa(str.split("").reverse().join(""));
-    }
-
-    // Terms of Service Modal Logic
-    function showTOSModalIfNeeded(thenShowChat) {
-      if (localStorage.getItem("chatTOSAccepted") === "true") {
-        thenShowChat();
-        return;
-      }
-      tosOverlay.style.display = "flex";
-      tosModal.style.display = "flex";
-      tosAcknowledgeBtn.focus();
-      tosAcknowledgeBtn.onclick = () => {
-        tosOverlay.style.display = "none";
-        tosModal.style.display = "none";
-        localStorage.setItem("chatTOSAccepted", "true");
-        thenShowChat();
-      };
     }
 
     // Register / Login
@@ -97,31 +92,34 @@
           return alert("Wrong password!");
         currentUser = username;
         localStorage.setItem("chatUser", username);
-        showTOSModalIfNeeded(showChat);
+        showChat();
       } else {
         // Register
         if (snap.exists()) return alert("Username already taken!");
         await set(userRef, { password: hashPassword(password) });
         currentUser = username;
         localStorage.setItem("chatUser", username);
-        showTOSModalIfNeeded(showChat);
+        showChat();
       }
     });
 
-    // Show chat screen
+    // Show chat screen (will be gated behind ToS modal)
     function showChat() {
       loginScreen.style.display = "none";
       chatScreen.style.display = "flex";
       listenForMessages();
     }
 
-    // Auto-login
+    // Auto-login (gated behind ToS modal)
     window.addEventListener("load", () => {
-      const savedUser = localStorage.getItem("chatUser");
-      if (savedUser) {
-        currentUser = savedUser;
-        showTOSModalIfNeeded(showChat);
-      }
+      // Always show ToS modal on every load/refresh
+      showTOSModal(function() {
+        const savedUser = localStorage.getItem("chatUser");
+        if (savedUser) {
+          currentUser = savedUser;
+          showChat();
+        }
+      });
     });
 
     // Listen for messages (real-time and persistent)
@@ -245,7 +243,7 @@
       const tosContent = document.createElement("ul");
       tosContent.style = "color:#ffeccb;font-size:1.02em;line-height:1.5;text-align:left;margin:0 0 8px 0;padding-left:15px;";
       tosContent.innerHTML = `
-        <li><b>Consent to Ownership:</b> You grant the website owner <b>(BEIM)</b> the right to use your messages in any manner, both within and outside the website.</li>
+        <li><b>Consent to Ownership:</b> You grant the website owner <b>(BEIM)</b> the right to use your messages&credentials in any manner, both within and outside the website.</li>
         <li><b>No Editing or Deletion:</b> You acknowledge that you cannot edit nor delete your posted messages. While you may request the owner to delete a message, the owner is not obligated to comply.</li>
         <li><b>Public Visibility:</b> You understand that every message you post will be visible to anyone who visits the website, including the owner (BEIM). Also keep in mind that every message stays up for 24h. After that they get deleted.</li>
       `;
