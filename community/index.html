@@ -3,367 +3,159 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>beim.space — Community Chat</title>
-
+  <title>Community Chat</title>
   <style>
-    :root{
-      --bg:#0f2027;
-      --panel: rgba(255,255,255,0.03);
-      --muted:#9aa6b2;
-      --accent:#00d4ff;
-      --btn:orange;
-    }
-    html,body{height:100%;margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto; background: radial-gradient(circle at bottom,#0f2027,#203a43,#2c5364); color:#eee}
-    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
-    .card{width:100%;max-width:1100px;background:var(--panel);border-radius:12px;padding:18px;box-shadow:0 12px 36px rgba(0,0,0,0.45);display:flex;gap:18px}
-    .left{flex:2;display:flex;flex-direction:column;gap:12px}
-    .right{flex:1;min-width:220px}
-    h1{margin:0;color:orange}
-    p.muted{color:var(--muted);margin:6px 0 0}
-    /* login */
-    .login { display:flex; gap:8px; flex-direction:column; align-items:flex-start; padding:10px; }
-    .login input{width:260px;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:inherit;outline:none}
-    .btn{padding:10px 14px;border-radius:8px;border:none;background:var(--btn);color:#111;cursor:pointer;font-weight:700}
-    .toggle{background:none;color:var(--btn);border:none;cursor:pointer;text-decoration:underline;padding:6px}
-    /* chat */
-    #messages{background:rgba(0,0,0,0.12);border-radius:10px;padding:12px;height:520px;overflow:auto;display:flex;flex-direction:column;gap:8px}
-    .msg{padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.01)}
-    .meta{font-size:0.85rem;color:var(--muted);display:flex;gap:10px;align-items:center;margin-bottom:6px}
-    .meta .name{font-weight:700}
-    .composer{display:flex;gap:8px;margin-top:10px}
-    .composer input{flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:inherit;outline:none}
-    .small{font-size:0.9rem;color:var(--muted)}
-    /* online list */
-    .online-box{background:rgba(0,0,0,0.06);padding:12px;border-radius:10px;height:520px;overflow:auto}
-    .user-item{padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
-    /* logout */
-    #logoutBtn{position:fixed;top:16px;right:16px;background:#ff4d4d;border:none;color:white;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;display:none}
-    #logoutBtn:hover{transform:translateY(-2px)}
-    @media(max-width:880px){.card{flex-direction:column}.right{order:2}.left{order:1} #messages{height:320px}.online-box{height:200px}}
+    html,body{height:100%;margin:0;font-family:sans-serif;background:#203a43;color:#eee;}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .card{width:100%;max-width:750px;background:rgba(255,255,255,0.04);border-radius:12px;padding:18px;}
+    #messages{background:rgba(0,0,0,0.09);border-radius:10px;padding:12px;height:300px;overflow-y:auto;margin:12px 0;}
+    .msg{margin-bottom:6px;padding:8px 12px;background:rgba(255,255,255,0.09);border-radius:8px;}
+    .meta{font-size:.92em;color:#90caf9;}
+    #online{margin-bottom:6px;font-size:.92em;color:#9aa6b2;}
+    .composer{display:flex;gap:8px;}
+    .composer input{flex:1;padding:9px;border-radius:7px;border:none;}
+    .composer button{padding:9px 14px;border:none;border-radius:7px;background:orange;font-weight:700;}
+    #authNotice{margin-left:9px;color:#ffb86b;}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="left">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <h1>Community Chat 💬</h1>
-            <p class="muted">Temporary chat — messages auto-expire after 24h. 7s cooldown. 50 chars max.</p>
-          </div>
-          <div id="youLabel" class="small">Not signed in</div>
-        </div>
-
-        <!-- LOGIN BOX -->
-        <div id="loginBox" class="login" style="margin-top:6px">
-          <input id="usernameInput" placeholder="Username (3–20 chars)" maxlength="20" />
-          <input id="passwordInput" type="password" placeholder="Password (min 3 chars)" />
-          <div style="display:flex;gap:8px;align-items:center">
-            <button id="authBtn" class="btn">Login</button>
-            <button id="modeBtn" class="toggle">Switch to Sign up</button>
-            <div id="authNotice" class="small" style="margin-left:12px;color:#ffb86b"></div>
-          </div>
-        </div>
-
-        <!-- CHAT BOX (hidden until logged) -->
-        <div id="chatBox" style="display:none; margin-top:6px">
-          <div id="messages" aria-live="polite"></div>
-
-          <div class="composer" style="margin-top:12px">
-            <input id="msgInput" placeholder="Write message... (max 50 chars)" maxlength="50" autocomplete="off" />
-            <button id="sendBtn" class="btn">Send</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT: online users -->
-      <div class="right">
-        <div style="margin-bottom:8px"><strong class="small">Online now</strong></div>
-        <div id="onlineList" class="online-box">
-          <div class="small" id="noOnline">No one online</div>
-        </div>
+<div class="wrap">
+  <div class="card">
+    <h1>Community Chat 💬</h1>
+    <div id="online"></div>
+    <div id="login" style="display:block">
+      <input id="user" placeholder="Username" maxlength="20">
+      <input id="pass" type="password" placeholder="Password">
+      <button id="loginBtn">Login</button>
+      <button id="signupBtn">Sign up</button>
+      <span id="authNotice"></span>
+    </div>
+    <div id="chat" style="display:none">
+      <div id="messages"></div>
+      <div class="composer">
+        <input id="msgInput" maxlength="50" placeholder="Write a message...">
+        <button id="sendBtn">Send</button>
+        <button id="logoutBtn">Logout</button>
       </div>
     </div>
   </div>
+</div>
+<script type="module">
+const {initializeApp} = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js');
+const {getDatabase,ref,push,onChildAdded,onValue,set,get,remove,query,orderByChild} = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js');
+const config = {
+  apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
+  authDomain: "beim-notes.firebaseapp.com",
+  databaseURL: "https://beim-notes-default-rtdb.firebaseio.com",
+  projectId: "beim-notes",
+  storageBucket: "beim-notes.appspot.com",
+  messagingSenderId: "861389311161",
+  appId: "1:861389311161:web:8d47e467a276f6a1e09f68"
+};
+const app = initializeApp(config);
+const db = getDatabase(app);
 
-  <button id="logoutBtn">Logout</button>
+const userEl = document.getElementById('user'), passEl = document.getElementById('pass');
+const loginDiv = document.getElementById('login'), chatDiv = document.getElementById('chat');
+const loginBtn = document.getElementById('loginBtn'), signupBtn = document.getElementById('signupBtn');
+const authNotice = document.getElementById('authNotice');
+const msgInput = document.getElementById('msgInput'), sendBtn = document.getElementById('sendBtn');
+const messagesDiv = document.getElementById('messages');
+const onlineDiv = document.getElementById('online');
+const logoutBtn = document.getElementById('logoutBtn');
 
-  <!-- Firebase + app -->
-  <script type="module">
-    document.addEventListener('DOMContentLoaded', async () => {
-      // dynamic imports
-      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js');
-      const {
-        getDatabase, ref, push, onChildAdded, onValue, set, get, remove, query, orderByChild
-      } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js');
+function hash(s){ return btoa(s.split('').reverse().join('')); }
+let myUser = localStorage.getItem('chatUser') || null;
+let cooldown = false;
 
-      // ---------- config (your project) ----------
-      const firebaseConfig = {
-        apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
-        authDomain: "beim-notes.firebaseapp.com",
-        databaseURL: "https://beim-notes-default-rtdb.firebaseio.com",
-        projectId: "beim-notes",
-        storageBucket: "beim-notes.firebasestorage.app",
-        messagingSenderId: "861389311161",
-        appId: "1:861389311161:web:8d47e467a276f6a1e09f68",
-        measurementId: "G-4PKVYPG2JS"
-      };
+async function updateOnline() {
+  onValue(ref(db, 'presence'), snap => {
+    const data = snap.val() || {};
+    const list = Object.keys(data);
+    onlineDiv.textContent = list.length ? 'Online: ' + list.join(', ') : 'No one online';
+  });
+}
+function showChatUI() {
+  loginDiv.style.display = 'none';
+  chatDiv.style.display = 'block';
+  msgInput.focus();
+  set(ref(db,'presence/'+myUser),{ts:Date.now()});
+  updateOnline();
+}
+function logout() {
+  remove(ref(db,'presence/'+myUser));
+  localStorage.removeItem('chatUser');
+  location.reload();
+}
+async function auth(doLogin) {
+  let u = userEl.value.trim(), p = passEl.value.trim();
+  if(u.length<3||u.length>20) { authNotice.textContent='Username=3–20 chars';return; }
+  if(p.length<3) { authNotice.textContent='Password too short';return; }
+  authNotice.textContent = '...';
+  const userRef = ref(db, 'users/'+u), snap = await get(userRef);
+  if(doLogin) {
+    if(!snap.exists()) { authNotice.textContent = 'User not found'; return; }
+    if(snap.val().password !== hash(p)) { authNotice.textContent='Wrong password'; return;}
+    myUser=u; localStorage.setItem('chatUser',u);
+    showChatUI();
+  } else {
+    if(snap.exists()) { authNotice.textContent = 'User taken'; return; }
+    await set(userRef, {password:hash(p)});
+    myUser=u; localStorage.setItem('chatUser',u);
+    showChatUI();
+  }
+}
+loginBtn.onclick = ()=>auth(true);
+signupBtn.onclick = ()=>auth(false);
+logoutBtn.onclick = logout;
 
-      const app = initializeApp(firebaseConfig);
-      const db = getDatabase(app);
+function renderMsg(msgObj) {
+  let d = document.createElement('div');
+  d.className='msg';
+  d.innerHTML =
+    '<div class="meta">'+(msgObj.user||'anon')+' @ '+(msgObj.time||'')+'</div>' +
+    '<div>' + (msgObj.text||'') + '</div>';
+  messagesDiv.appendChild(d);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
 
-      // nodes
-      const messagesRef = ref(db, 'chat');          // messages
-      const usersRef = ref(db, 'users');            // simple user store (passwords hashed)
-      const presenceRef = ref(db, 'presence');      // who is online
+async function sendMessage() {
+  if(!myUser||cooldown) return;
+  let text = (msgInput.value||'').trim();
+  if(!text) return;
+  if(text.length>50) return;
+  let now = new Date();
+  let hh=String(now.getHours()).padStart(2,'0'), mm=String(now.getMinutes()).padStart(2,'0');
+  await push(ref(db,'chat'),{user:myUser,text:text,time:`${hh}:${mm}`,timestamp:now.getTime()});
+  msgInput.value='';
+  cooldown = true; sendBtn.disabled=true;
+  setTimeout(()=>{cooldown=false;sendBtn.disabled=false;}, 7000);
+}
 
-      // UI refs
-      const usernameInput = document.getElementById('usernameInput');
-      const passwordInput = document.getElementById('passwordInput');
-      const authBtn = document.getElementById('authBtn');
-      const modeBtn = document.getElementById('modeBtn');
-      const authNotice = document.getElementById('authNotice');
-      const loginBox = document.getElementById('loginBox');
-      const chatBox = document.getElementById('chatBox');
-      const messagesEl = document.getElementById('messages');
-      const msgInput = document.getElementById('msgInput');
-      const sendBtn = document.getElementById('sendBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const youLabel = document.getElementById('youLabel');
-      const onlineList = document.getElementById('onlineList');
-      const noOnline = document.getElementById('noOnline');
+sendBtn.onclick = sendMessage;
+msgInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
-      let isLoginMode = true;
-      let currentUser = null;
-      let locked = false; // cooldown
+function liveMessages() {
+  const q = query(ref(db,'chat'),orderByChild('timestamp'));
+  onChildAdded(q, async snap=>{
+    let obj = snap.val(), key=snap.key;
+    if(!obj) return;
+    let age=Date.now()-(obj.timestamp||0);
+    if(age>24*60*60*1000) { await remove(ref(db,'chat/'+key)); return;}
+    renderMsg(obj);
+  });
+}
 
-      // small utilities
-      function hashPassword(s){ return btoa(s.split('').reverse().join('')); } // small obfuscation
-      function usernameColor(name){
-        let h=0;
-        for(let i=0;i<name.length;i++) h = name.charCodeAt(i) + ((h<<5)-h);
-        return `hsl(${Math.abs(h)%360} 70% 60%)`;
-      }
+if(myUser) {
+  showChatUI(); liveMessages();
+} else {
+  chatDiv.style.display='none';
+}
 
-      // toggle login/signup
-      modeBtn.addEventListener('click', () => {
-        isLoginMode = !isLoginMode;
-        authBtn.textContent = isLoginMode ? 'Login' : 'Sign up';
-        modeBtn.textContent = isLoginMode ? 'Switch to Sign up' : 'Switch to Login';
-        authNotice.textContent = '';
-      });
+loginDiv.style.display=myUser?'none':'block';
+chatDiv.style.display=myUser?'block':'none';
+liveMessages(); // so messages show to those not logged in, too
 
-      // show/hide UI helpers
-      function showChatUI(user){
-        currentUser = user;
-        loginBox.style.display = 'none';
-        chatBox.style.display = 'block';
-        logoutBtn.style.display = 'inline-block';
-        youLabel.textContent = 'You: ' + user;
-        msgInput.focus();
-        attachPresence(user);
-        startListeningMessages();
-        startListeningPresence();
-      }
-
-      // Auto-login if localStorage has user
-      const stored = localStorage.getItem('chatUser');
-      if(stored){
-        showChatUI(stored);
-      }
-
-      // AUTH (login or sign up)
-      authBtn.addEventListener('click', async () => {
-        const u = (usernameInput.value || '').trim();
-        const p = (passwordInput.value || '').trim();
-        if(u.length < 3 || u.length > 20){ authNotice.textContent = 'Username 3–20 chars'; return; }
-        if(p.length < 3){ authNotice.textContent = 'Password min 3 chars'; return; }
-        authNotice.textContent = '...';
-
-        try{
-          const userRef = ref(db, 'users/' + u);
-          const snap = await get(userRef);
-          if(isLoginMode){
-            if(!snap.exists()){ authNotice.textContent = 'User not found'; return; }
-            if(snap.val().password !== hashPassword(p)){ authNotice.textContent = 'Wrong password'; return; }
-            // success
-            localStorage.setItem('chatUser', u);
-            authNotice.textContent = '';
-            showChatUI(u);
-          } else {
-            // sign-up
-            if(snap.exists()){ authNotice.textContent = 'Username taken'; return; }
-            await set(userRef, { password: hashPassword(p) });
-            localStorage.setItem('chatUser', u);
-            authNotice.textContent = '';
-            showChatUI(u);
-          }
-        } catch(err){
-          console.error(err);
-          authNotice.textContent = 'Network error';
-        }
-      });
-
-      // LOGOUT
-      logoutBtn.addEventListener('click', async () => {
-        // remove presence entry if exists
-        const user = localStorage.getItem('chatUser');
-        if(user) {
-          try { await remove(ref(db, 'presence/' + user)); } catch(e){ /*ignore*/ }
-        }
-        localStorage.removeItem('chatUser');
-        location.reload();
-      });
-
-      // presence: set presence and onDisconnect remove it
-      async function attachPresence(user){
-        try{
-          const pRef = ref(db, 'presence/' + user);
-          // set presence (value is timestamp)
-          await set(pRef, { ts: Date.now() });
-          // onDisconnect remove
-          // Firebase JS Realtime needs onDisconnect API - dynamic import for it:
-          const { onDisconnect } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js');
-          const od = onDisconnect(pRef);
-          od.remove().catch(()=>{});
-        }catch(e){ console.warn('presence failed', e); }
-      }
-
-      // listen presence list
-      function startListeningPresence(){
-        const pRef = ref(db, 'presence');
-        onValue(pRef, (snap) => {
-          const data = snap.val() || {};
-          onlineList.innerHTML = '';
-          const names = Object.keys(data);
-          if(names.length === 0){
-            noOnline.style.display = 'block';
-            return;
-          }
-          noOnline.style.display = 'none';
-          names.forEach(n => {
-            const item = document.createElement('div');
-            item.className = 'user-item';
-            const left = document.createElement('div');
-            const colorDot = document.createElement('span');
-            colorDot.style.display = 'inline-block';
-            colorDot.style.width = '10px';
-            colorDot.style.height = '10px';
-            colorDot.style.marginRight = '8px';
-            colorDot.style.borderRadius = '50%';
-            colorDot.style.background = usernameColor(n);
-            left.appendChild(colorDot);
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = n;
-            left.appendChild(nameSpan);
-            const tsSpan = document.createElement('div');
-            tsSpan.style.color = 'var(--muted)';
-            tsSpan.style.fontSize = '0.85rem';
-            const ago = Date.now() - (data[n].ts || 0);
-            tsSpan.textContent = ago < 60000 ? 'now' : Math.round(ago/60000) + 'm';
-            item.appendChild(left);
-            item.appendChild(tsSpan);
-            onlineList.appendChild(item);
-          });
-        });
-      }
-
-      // messages: listen and render
-      let messagesStarted = false;
-      function startListeningMessages(){
-        if(messagesStarted) return;
-        messagesStarted = true;
-        // order by timestamp
-        const q = query(messagesRef, orderByChild('timestamp'));
-        onChildAdded(q, async (snap) => {
-          const obj = snap.val();
-          const key = snap.key;
-          if(!obj) return;
-          // auto-remove if >24h
-          const age = Date.now() - (obj.timestamp || 0);
-          if(age > 24*60*60*1000){
-            try{ await remove(ref(db, 'chat/' + key)); } catch(e){}
-            return;
-          }
-          renderMessage(obj);
-        });
-      }
-
-      // render message element
-      function renderMessage(obj){
-        const d = document.createElement('div');
-        d.className = 'msg';
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        const name = document.createElement('span');
-        name.className = 'name';
-        name.textContent = obj.user || 'anon';
-        name.style.color = usernameColor(obj.user || 'anon');
-        const time = document.createElement('span');
-        time.textContent = obj.time || '';
-        time.style.marginLeft = '8px';
-        meta.appendChild(name);
-        meta.appendChild(time);
-        const text = document.createElement('div');
-        text.textContent = obj.text || '';
-        d.appendChild(meta);
-        d.appendChild(text);
-        messagesEl.appendChild(d);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-      }
-
-      // send message
-      async function sendMessage(){
-        if(!localStorage.getItem('chatUser')) return;
-        if(locked) {
-          authNotice.textContent = '⏳ Wait before sending...';
-          setTimeout(()=> authNotice.textContent = '',1500);
-          return;
-        }
-        const text = (msgInput.value || '').trim();
-        if(!text) return;
-        if(text.length > 50){ authNotice.textContent = 'Max 50 chars'; setTimeout(()=> authNotice.textContent='',1500); return; }
-        const user = localStorage.getItem('chatUser');
-        const now = new Date();
-        const hh = String(now.getHours()).padStart(2,'0');
-        const mm = String(now.getMinutes()).padStart(2,'0');
-        try{
-          await push(messagesRef, {
-            user: user,
-            text: text,
-            time: hh + ':' + mm,
-            timestamp: now.getTime()
-          });
-          msgInput.value = '';
-          locked = true;
-          sendBtn.disabled = true;
-          setTimeout(()=>{ locked = false; sendBtn.disabled = false; }, 7000);
-        }catch(e){
-          console.error('send failed', e);
-          authNotice.textContent = 'Failed to send';
-          setTimeout(()=> authNotice.textContent = '',1500);
-        }
-      }
-
-      // Enter to send
-      msgInput.addEventListener('keydown', (e) => {
-        if(e.key === 'Enter'){ e.preventDefault(); sendMessage(); }
-      });
-      sendBtn.addEventListener('click', sendMessage);
-
-      // small helper: if user already logged before page loaded
-      if(localStorage.getItem('chatUser')){
-        // UI already switched in showChatUI called earlier? ensure:
-        loginBox.style.display = 'none';
-        chatBox.style.display = 'block';
-        logoutBtn.style.display = 'inline-block';
-        youLabel.textContent = 'You: ' + localStorage.getItem('chatUser');
-        attachPresence(localStorage.getItem('chatUser'));
-        startListeningMessages();
-        startListeningPresence();
-      }
-
-    }); // DOMContentLoaded
-  </script>
+</script>
 </body>
 </html>
