@@ -16,6 +16,7 @@
     .composer input{flex:1;padding:9px;border-radius:7px;border:none;}
     .composer button{padding:9px 14px;border:none;border-radius:7px;background:orange;font-weight:700;}
     #authNotice{margin-left:9px;color:#ffb86b;}
+    .toggleModeBtn{background:none;border:none;color:orange;text-decoration:underline;cursor:pointer;margin-top:5px;font-size:1em;}
   </style>
 </head>
 <body>
@@ -24,11 +25,15 @@
     <h1>Community Chat 💬</h1>
     <div id="online"></div>
     <div id="login" style="display:block">
+      <h2 id="loginModeTitle">Login</h2>
       <input id="user" placeholder="Username" maxlength="20">
       <input id="pass" type="password" placeholder="Password">
-      <button id="loginBtn">Login</button>
-      <button id="signupBtn">Sign up</button>
-      <span id="authNotice"></span>
+      <div>
+        <button id="loginBtn">Login</button>
+        <button id="signupBtn">Sign up</button>
+        <span id="authNotice"></span>
+      </div>
+      <button class="toggleModeBtn" id="toggleModeBtn">Switch to Sign up</button>
     </div>
     <div id="chat" style="display:none">
       <div id="messages"></div>
@@ -63,10 +68,33 @@ const msgInput = document.getElementById('msgInput'), sendBtn = document.getElem
 const messagesDiv = document.getElementById('messages');
 const onlineDiv = document.getElementById('online');
 const logoutBtn = document.getElementById('logoutBtn');
+const loginModeTitle = document.getElementById('loginModeTitle');
+const toggleModeBtn = document.getElementById('toggleModeBtn');
 
 function hash(s){ return btoa(s.split('').reverse().join('')); }
 let myUser = localStorage.getItem('chatUser') || null;
 let cooldown = false;
+
+let loginMode = true; // true for Login, false for Sign Up
+
+function updateLoginUI() {
+  if (loginMode) {
+    loginModeTitle.textContent = "Login";
+    loginBtn.style.display = 'inline-block';
+    signupBtn.style.display = 'none';
+    toggleModeBtn.textContent = "Switch to Sign up";
+  } else {
+    loginModeTitle.textContent = "Sign Up";
+    loginBtn.style.display = 'none';
+    signupBtn.style.display = 'inline-block';
+    toggleModeBtn.textContent = "Switch to Login";
+  }
+  authNotice.textContent = '';
+}
+toggleModeBtn.onclick = function() {
+  loginMode = !loginMode;
+  updateLoginUI();
+};
 
 async function updateOnline() {
   onValue(ref(db, 'presence'), snap => {
@@ -150,6 +178,7 @@ if(myUser) {
   showChatUI(); liveMessages();
 } else {
   chatDiv.style.display='none';
+  updateLoginUI(); // set correct initial login/signup view
 }
 
 loginDiv.style.display=myUser?'none':'block';
