@@ -67,10 +67,12 @@
       const snap = await get(userRef);
 
       if (isLoginMode) {
+        // Login
         if (!snap.exists()) return alert("User not found!");
         if (snap.val().password !== hashPassword(password))
           return alert("Wrong password!");
       } else {
+        // Register
         if (snap.exists()) return alert("Username already taken!");
         await set(userRef, { password: hashPassword(password) });
       }
@@ -86,6 +88,7 @@
       chatScreen.style.display = "flex";
       messagesDiv.innerHTML = ""; // clear old messages
       listenForMessages();
+      scrollToBottom();
       msgInput.focus();
     }
 
@@ -121,8 +124,13 @@
         div.classList.add("msg");
         div.innerHTML = `<b>${msg.user}:</b> ${msg.text}`;
         messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        scrollToBottom();
       });
+    }
+
+    // Scroll to bottom
+    function scrollToBottom() {
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
     // Send message (with cooldown)
@@ -138,14 +146,14 @@
         timestamp: Date.now()
       });
 
-      msgInput.value = "";
+      msgInput.value = ""; // clear input after sending
       cooldown = true;
       sendBtn.disabled = true;
 
       setTimeout(() => {
         cooldown = false;
         sendBtn.disabled = false;
-      }, 7000);
+      }, 7000); // 7 second cooldown
     }
 
     sendBtn.addEventListener("click", sendMessage);
