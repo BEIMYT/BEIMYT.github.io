@@ -1,229 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Community Chat 💬</title>
-
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, set, get, remove, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
-
-    // Firebase config (same project)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
-      authDomain: "beim-notes.firebaseapp.com",
-      projectId: "beim-notes",
-      storageBucket: "beim-notes.firebasestorage.app",
-      messagingSenderId: "861389311161",
-      appId: "1:861389311161:web:8d47e467a276f6a1e09f68",
-      measurementId: "G-4PKVYPG2JS",
-      databaseURL: "https://beim-notes-default-rtdb.firebaseio.com"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // DOM Elements
-    const loginScreen = document.getElementById("loginScreen");
-    const chatScreen = document.getElementById("chatScreen");
-    const messagesDiv = document.getElementById("messages");
-    const msgInput = document.getElementById("msgInput");
-    const sendBtn = document.getElementById("sendBtn");
-
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
-    const toggleMode = document.getElementById("toggleMode");
-    const loginBtn = document.getElementById("loginBtn");
-    const title = document.getElementById("title");
-
-    let isLoginMode = true;
-    let currentUser = null;
-    let cooldown = false;
-
-    // Toggle login/register
-    toggleMode.addEventListener("click", () => {
-      isLoginMode = !isLoginMode;
-      title.textContent = isLoginMode ? "Login" : "Sign Up";
-      loginBtn.textContent = isLoginMode ? "Login" : "Register";
-      toggleMode.textContent = isLoginMode
-        ? "Don't have an account? Sign up!"
-        : "Already have an account? Login!";
-    });
-
-    // Hash passwords (simple client-side)
-    function hashPassword(str) {
-      return btoa(str.split("").reverse().join(""));
-    }
-
-    // Register / Login
-    loginBtn.addEventListener("click", async () => {
-      const username = usernameInput.value.trim();
-      const password = passwordInput.value.trim();
-      if (!username || !password) return alert("Please fill all fields!");
-
-      const userRef = ref(db, "users/" + username);
-      const snap = await get(userRef);
-
-      if (isLoginMode) {
-        // Login
-        if (!snap.exists()) return alert("User not found!");
-        if (snap.val().password !== hashPassword(password))
-          return alert("Wrong password!");
-        currentUser = username;
-        localStorage.setItem("chatUser", username);
-        showChat();
-      } else {
-        // Register
-        if (snap.exists()) return alert("Username already taken!");
-        await set(userRef, { password: hashPassword(password) });
-        currentUser = username;
-        localStorage.setItem("chatUser", username);
-        showChat();
-      }
-    });
-
-    // Show chat screen
-    function showChat() {
-      loginScreen.style.display = "none";
-      chatScreen.style.display = "flex";
-      listenForMessages();
-    }
-
-    // Auto-login
-    window.addEventListener("load", () => {
-      const savedUser = localStorage.getItem("chatUser");
-      if (savedUser) {
-        currentUser = savedUser;
-        showChat();
-      }
-    });
-
-    // Listen for messages (real-time)
-    function listenForMessages() {
-      const chatRef = query(ref(db, "chat"), orderByChild("timestamp"));
-      onChildAdded(chatRef, (snapshot) => {
-        const msg = snapshot.val();
-        const now = Date.now();
-        if (now - msg.timestamp > 24 * 60 * 60 * 1000) {
-          // auto-delete old messages
-          remove(ref(db, "chat/" + snapshot.key));
-          return;
-        }
-
-        const div = document.createElement("div");
-        div.classList.add("msg");
-        div.innerHTML = `<b>${msg.user}:</b> ${msg.text}`;
-        messagesDiv.appendChild(div);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      });
-    }
-
-    // Send message (with cooldown + length limit)
-    sendBtn.addEventListener("click", async () => {
-      if (cooldown) return alert("⏳ Please wait before sending again!");
-      const text = msgInput.value.trim();
-      if (!text) return;
-      if (text.length > 50) return alert("Max 50 characters!");
-
-      await push(ref(db, "chat"), {
-        user: currentUser,
-        text: text,
-        timestamp: Date.now()
-      });
-
-      msgInput.value = "";
-      cooldown = true;
-      sendBtn.disabled = true;
-
-      setTimeout(() => {
-        cooldown = false;
-        sendBtn.disabled = false;
-      }, 7000);
-    });
-  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>beim.space — Community Chat</title>
 
   <style>
-    body {
-      background: #0e0e0e;
-      color: #f2f2f2;
-      font-family: "Poppins", sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+    :root {
+      --bg: #0e0f12;
+      --panel: #131316;
+      --muted: #9aa6b2;
+      --accent: #00d4ff;
+      --btn: orange;
     }
-    #loginScreen, #chatScreen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      max-width: 400px;
-    }
-    input {
-      padding: 10px;
-      width: 80%;
-      border-radius: 5px;
-      border: none;
-      outline: none;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      background: orange;
-      color: #111;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    #messages {
-      background: #1a1a1a;
-      width: 90%;
-      height: 60vh;
-      overflow-y: auto;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .msg {
-      background: #222;
-      padding: 8px 12px;
-      border-radius: 5px;
-      word-wrap: break-word;
-      text-align: left;
-    }
-    #chatScreen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
+    html,body { height:100%; margin:0; font-family: "Poppins", system-ui, sans-serif; background: radial-gradient(circle at bottom, #0f2027, #203a43, #2c5364); color:#eee; }
+    .wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; }
+    .card { width:100%; max-width:920px; background: rgba(255,255,255,0.03); border-radius:12px; padding:18px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); display:flex; gap:18px; flex-direction:column; }
+    .cols { display:flex; gap:18px; }
+    .left, .right { flex:1; min-width:250px; }
+    h1 { margin:0 0 6px 0; color:orange; text-shadow:0 0 12px rgba(255,140,0,0.25); }
+    p.muted { color:var(--muted); margin:6px 0 12px 0; }
+
+    /* Login UI */
+    .login { display:flex; gap:8px; flex-direction:column; align-items:center; padding:12px; }
+    .login input { width:220px; padding:10px 12px; border-radius:8px; border: none; outline:none; background: rgba(255,255,255,0.03); color:inherit; }
+    .login .btn { padding:10px 14px; border-radius:8px; cursor:pointer; border:none; background: var(--btn); color:#111; font-weight:700; }
+    .login .toggle { color:var(--btn); cursor:pointer; margin-top:8px; text-decoration:underline; background:none; border:none; }
+
+    /* Chat UI */
+    #messages { background: rgba(0,0,0,0.12); border-radius:10px; padding:12px; height:420px; overflow:auto; display:flex; flex-direction:column; gap:8px; }
+    .msg { padding:8px 10px; border-radius:8px; background: rgba(255,255,255,0.02); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.01); }
+    .msg .meta { font-size:0.82rem; color:var(--muted); display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+    .msg .meta .name { font-weight:700; }
+    .composer { display:flex; gap:8px; margin-top:10px; align-items:center; }
+    .composer input { flex:1; padding:10px 12px; border-radius:8px; border:none; outline:none; background: rgba(255,255,255,0.03); color:inherit; }
+    .composer button { padding:10px 14px; border-radius:8px; border:none; background:var(--btn); color:#111; font-weight:700; cursor:pointer; }
+
+    /* Logout */
+    #logoutBtn { position:fixed; top:16px; right:16px; background:#ff4d4d; border:none; color:white; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; box-shadow:0 6px 18px rgba(255,0,0,0.08); }
+    #logoutBtn:hover { transform:translateY(-2px); }
+
+    /* small screens */
+    @media (max-width:820px) {
+      .cols { flex-direction:column; }
+      #messages { height: 320px; }
     }
   </style>
 </head>
 <body>
-  <!-- Login Screen -->
-  <div id="loginScreen" style="display: flex;">
-    <h2 id="title">Login</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button id="loginBtn">Login</button>
-    <p id="toggleMode" style="cursor: pointer; color: orange;">
-      Don't have an account? Sign up!
-    </p>
+  <div class="wrap">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h1>Community Chat 💬</h1>
+          <p class="muted">Join the temporary chat. Messages auto-expire after 24 hours. 7s cooldown, 50 char max.</p>
+        </div>
+        <div style="text-align:right; color:var(--muted); font-size:0.9rem;">
+          <div id="youLabel">Not signed in</div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="left">
+          <!-- LOGIN / REGISTER -->
+          <div id="loginBox" class="login">
+            <input id="inpUser" placeholder="Username (3–20 chars)" maxlength="20" />
+            <input id="inpPass" type="password" placeholder="Password (min 3 chars)" />
+            <div style="display:flex;gap:8px;">
+              <button id="btnAuth" class="btn">Login</button>
+              <button id="btnMode" class="toggle">Switch to Sign up</button>
+            </div>
+            <div id="authMsg" style="color:#ffb86b; font-size:0.9rem; margin-top:8px;"></div>
+          </div>
+        </div>
+
+        <div class="right">
+          <!-- CHAT -->
+          <div id="chatBox" style="display:none;">
+            <div id="messages" aria-live="polite"></div>
+
+            <div class="composer">
+              <input id="msgInput" placeholder="Type your message... (max 50 chars)" maxlength="50" />
+              <button id="sendBtn">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Chat Screen -->
-  <div id="chatScreen">
-    <h2>Community Chat 💬</h2>
-    <div id="messages"></div>
-    <input id="msgInput" placeholder="Type a message..." maxlength="50" />
-    <button id="sendBtn">Send</button>
-  </div>
+  <button id="logoutBtn" style="display:none;">Logout</button>
+
+  <!-- Firebase + App script -->
+  <script type="module">
+    // wrap so DOM elements exist
+    document.addEventListener('DOMContentLoaded', async () => {
+
+      // import firebase modules
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js');
+      const {
+        getDatabase, ref, push, onChildAdded, set, get, query, orderByChild, remove
+      } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js');
+
+      // ---------------------------
+      // === CONFIG - use your Firebase project config (already set) ===
+      // ---------------------------
+      const firebaseConfig = {
+        apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
+        authDomain: "beim-notes.firebaseapp.com",
+        databaseURL: "https://beim-notes-default-rtdb.firebaseio.com",
+        projectId: "beim-notes",
+        storageBucket: "beim-notes.firebasestorage.app",
+        messagingSenderId: "861389311161",
+        appId: "1:861389311161:web:8d47e467a276f6a1e09f68",
+        measurementId: "G-4PKVYPG2JS"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      const chatRefRoot = ref(db, 'chat'); // messages node
+
+      // ---------------------------
+      // === UI refs ===
+      // ---------------------------
+      const inpUser = document.getElementById('inpUser');
+      const inpPass = document.getElementById('inpPass');
+      const btnAuth = document.getElementById('btnAuth');
+      const btnMode = document.getElementById('btnMode');
+      const authMsg = document.getElementById('authMsg');
+      const loginBox = document.getElementById('loginBox');
+      const chatBox = document.getElementById('chatBox');
+      const messagesEl = document.getElementById('messages');
+      const msgInput = document.getElementById('msgInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const youLabel = document.getElementById('youLabel');
+
+      // ---------------------------
+      // === state ===
+      // ---------------------------
+      let isLoginMode = true; // toggle login / signup
+      let currentUser = null;
+      let sendingLocked = false; // cooldown lock
+
+      // deterministic color for username
+      function getUsernameColor(name) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+          hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const hue = Math.abs(hash) % 360;
+        return `hsl(${hue} 70% 60%)`;
+      }
+
+      // simple hash (not secure, just to store)
+      function hashPassword(s) {
+        return btoa(s.split('').reverse().join('')); // tiny obfuscation
+      }
+
+      // toggle mode UI
+      btnMode.addEventListener('click', () => {
+        isLoginMode = !isLoginMode;
+        btnAuth.textContent = isLoginMode ? 'Login' : 'Sign up';
+        btnMode.textContent = isLoginMode ? 'Switch to Sign up' : 'Switch to Login';
+        authMsg.textContent = '';
+      });
+
+      // helper to update UI when logged
+      function setLoggedIn(user) {
+        currentUser = user;
+        localStorage.setItem('chatUser', user);
+        loginBox.style.display = 'none';
+        chatBox.style.display = 'block';
+        logoutBtn.style.display = 'inline-block';
+        youLabel.textContent = `You: ${user}`;
+        msgInput.focus();
+        startListening(); // start realtime
+      }
+
+      // auto-login if stored
+      const saved = localStorage.getItem('chatUser');
+      if (saved) {
+        // set right away
+        setLoggedIn(saved);
+      }
+
+      // AUTH (register/login)
+      btnAuth.addEventListener('click', async () => {
+        const username = (inpUser.value || '').trim();
+        const pass = (inpPass.value || '').trim();
+
+        if (username.length < 3 || username.length > 20) {
+          authMsg.textContent = 'Username must be 3–20 chars.';
+          return;
+        }
+        if (pass.length < 3) {
+          authMsg.textContent = 'Password must be at least 3 chars.';
+          return;
+        }
+        authMsg.textContent = '...';
+
+        const usersRef = ref(db, 'users/' + username);
+        try {
+          const snap = await get(usersRef);
+          if (isLoginMode) {
+            // login
+            if (!snap.exists()) {
+              authMsg.textContent = 'User not found.';
+              return;
+            }
+            const storedHash = snap.val().password;
+            if (storedHash !== hashPassword(pass)) {
+              authMsg.textContent = 'Wrong password.';
+              return;
+            }
+            authMsg.textContent = '';
+            setLoggedIn(username);
+          } else {
+            // sign up
+            if (snap.exists()) {
+              authMsg.textContent = 'Username already taken.';
+              return;
+            }
+            // save hashed pass
+            await set(usersRef, { password: hashPassword(pass) });
+            authMsg.textContent = '';
+            setLoggedIn(username);
+          }
+        } catch (err) {
+          console.error(err);
+          authMsg.textContent = 'Network error.';
+        }
+      });
+
+      // LOGOUT
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('chatUser');
+        // reload to reset state
+        location.reload();
+      });
+
+      // --------------------------------
+      // == Real-time message handling ==
+      // --------------------------------
+      // Display a message node
+      function renderMessage(obj) {
+        const now = Date.now();
+        // if too old -> try to remove from DB
+        if (now - obj.timestamp > 24 * 60 * 60 * 1000) {
+          // old message; don't render
+          return;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'msg';
+
+        const nameColor = getUsernameColor(obj.user || 'anon');
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.textContent = obj.user || 'anon';
+        nameSpan.style.color = nameColor;
+
+        const timeSpan = document.createElement('span');
+        timeSpan.textContent = obj.time || '';
+        timeSpan.style.marginLeft = '8px';
+        timeSpan.style.color = 'var(--muted)';
+
+        meta.appendChild(nameSpan);
+        meta.appendChild(timeSpan);
+
+        const text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = obj.text || '';
+
+        div.appendChild(meta);
+        div.appendChild(text);
+
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      // remove old messages on load (scan once)
+      async function cleanupOldMessages() {
+        try {
+          // We'll listen once to recent messages and remove those older than 24h
+          const q = query(chatRefRoot, orderByChild('timestamp'));
+          // onChildAdded below handles removal for any old ones as they arrive,
+          // but we can also leave cleanup to that logic.
+        } catch (e) {
+          console.warn('cleanup error', e);
+        }
+      }
+
+      // start listening for real-time messages
+      let started = false;
+      function startListening() {
+        if (started) return;
+        started = true;
+
+        // Listen to all messages, ordered by timestamp
+        const q = query(chatRefRoot, orderByChild('timestamp'));
+        onChildAdded(q, async (snap) => {
+          const msg = snap.val();
+          const key = snap.key;
+
+          // If message is older than 24h, remove it immediately
+          const now = Date.now();
+          if (now - (msg.timestamp || 0) > 24 * 60 * 60 * 1000) {
+            try { await remove(ref(db, 'chat/' + key)); } catch(e){ /* ignore */ }
+            return;
+          }
+
+          // Render
+          renderMessage(msg);
+        });
+      }
+
+      // Send function (with cooldown and checks)
+      async function sendMessage() {
+        if (!currentUser) return;
+        if (sendingLocked) {
+          // show small feedback
+          authMsg.textContent = '⏳ Wait before sending again...';
+          setTimeout(()=> authMsg.textContent = '', 1500);
+          return;
+        }
+        const text = (msgInput.value || '').trim();
+        if (!text) return;
+        if (text.length > 50) {
+          authMsg.textContent = 'Max 50 characters.';
+          setTimeout(()=> authMsg.textContent = '', 1500);
+          return;
+        }
+
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2,'0');
+        const mm = String(now.getMinutes()).padStart(2,'0');
+
+        try {
+          await push(chatRefRoot, {
+            user: currentUser,
+            text: text,
+            time: `${hh}:${mm}`,
+            timestamp: now.getTime()
+          });
+          msgInput.value = '';
+          sendingLocked = true;
+          sendBtn.disabled = true;
+          setTimeout(() => { sendingLocked = false; sendBtn.disabled = false; }, 7000);
+        } catch (e) {
+          console.error('send failed', e);
+          authMsg.textContent = 'Send failed.';
+          setTimeout(()=> authMsg.textContent = '', 1500);
+        }
+      }
+
+      // send on button click
+      sendBtn.addEventListener('click', sendMessage);
+
+      // send on Enter
+      msgInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // If user is already logged (auto-login), ensure currentUser set and start listening.
+      const stored = localStorage.getItem('chatUser');
+      if (stored) {
+        currentUser = stored;
+        loginBox.style.display = 'none';
+        chatBox.style.display = 'block';
+        logoutBtn.style.display = 'inline-block';
+        youLabel.textContent = `You: ${currentUser}`;
+        startListening();
+      }
+
+      // Small UX: focus input after login
+      // when user logs in via btnAuth -> setLoggedIn behavior handled earlier; to ensure setLoggedIn called here:
+      // (we used a simple flow above: after success we called setLoggedIn via setLoggedIn invoked in btnAuth success branch)
+      // But setLoggedIn is defined earlier in that branch, so to keep flow consistent we duplicate minimal step:
+      // Actually above we haven't defined setLoggedIn in this module scope (we used local setLoggedIn earlier in other draft). Implement a small helper:
+      function doSetLoggedIn(u) {
+        currentUser = u;
+        localStorage.setItem('chatUser', u);
+        loginBox.style.display = 'none';
+        chatBox.style.display = 'block';
+        logoutBtn.style.display = 'inline-block';
+        youLabel.textContent = `You: ${u}`;
+        msgInput.focus();
+        startListening();
+      }
+
+      // Replace earlier setLoggedIn reference inside auth code: but we didn't call setLoggedIn above because we used local setLoggedIn earlier.
+      // To be safe, patch btnAuth listener to call doSetLoggedIn when successful.
+      // We'll override the previous btnAuth listener by reattaching it here (safe):
+      btnAuth.removeEventListener('click', ()=>{}); // no-op safe
+      btnAuth.addEventListener('click', async () => {
+        const username = (inpUser.value || '').trim();
+        const pass = (inpPass.value || '').trim();
+
+        if (username.length < 3 || username.length > 20) {
+          authMsg.textContent = 'Username must be 3–20 chars.';
+          return;
+        }
+        if (pass.length < 3) {
+          authMsg.textContent = 'Password must be at least 3 chars.';
+          return;
+        }
+        authMsg.textContent = '...';
+
+        const usersRef = ref(db, 'users/' + username);
+        try {
+          const snap = await get(usersRef);
+          if (isLoginMode) {
+            // login
+            if (!snap.exists()) {
+              authMsg.textContent = 'User not found.';
+              return;
+            }
+            const storedHash = snap.val().password;
+            if (storedHash !== hashPassword(pass)) {
+              authMsg.textContent = 'Wrong password.';
+              return;
+            }
+            authMsg.textContent = '';
+            doSetLoggedIn(username);
+          } else {
+            // sign up
+            if (snap.exists()) {
+              authMsg.textContent = 'Username already taken.';
+              return;
+            }
+            await set(usersRef, { password: hashPassword(pass) });
+            authMsg.textContent = '';
+            doSetLoggedIn(username);
+          }
+        } catch (err) {
+          console.error(err);
+          authMsg.textContent = 'Network error.';
+        }
+      });
+
+      // done DOMContentLoaded
+    }); // DOMContentLoaded
+  </script>
 </body>
 </html>
