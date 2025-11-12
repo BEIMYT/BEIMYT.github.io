@@ -10,6 +10,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded, set, get, remove, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
+    // Firebase config (same project)
     const firebaseConfig = {
       apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
       authDomain: "beim-notes.firebaseapp.com",
@@ -30,7 +31,6 @@
     const messagesDiv = document.getElementById("messages");
     const msgInput = document.getElementById("msgInput");
     const sendBtn = document.getElementById("sendBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
 
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
@@ -52,7 +52,7 @@
         : "Already have an account? Login!";
     });
 
-    // Simple client-side password hash
+    // Hash passwords (simple client-side)
     function hashPassword(str) {
       return btoa(str.split("").reverse().join(""));
     }
@@ -71,25 +71,24 @@
         if (!snap.exists()) return alert("User not found!");
         if (snap.val().password !== hashPassword(password))
           return alert("Wrong password!");
+        currentUser = username;
+        localStorage.setItem("chatUser", username);
+        showChat();
       } else {
         // Register
         if (snap.exists()) return alert("Username already taken!");
         await set(userRef, { password: hashPassword(password) });
+        currentUser = username;
+        localStorage.setItem("chatUser", username);
+        showChat();
       }
-
-      currentUser = username;
-      localStorage.setItem("chatUser", username);
-      showChat();
     });
 
     // Show chat screen
     function showChat() {
       loginScreen.style.display = "none";
       chatScreen.style.display = "flex";
-      messagesDiv.innerHTML = ""; // clear old messages
       listenForMessages();
-      scrollToBottom();
-      msgInput.focus();
     }
 
     // Auto-login
@@ -98,15 +97,7 @@
       if (savedUser) {
         currentUser = savedUser;
         showChat();
-      } else {
-        loginScreen.style.display = "flex";
       }
-    });
-
-    // Logout
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("chatUser");
-      location.reload();
     });
 
     // Listen for messages (real-time)
@@ -116,6 +107,7 @@
         const msg = snapshot.val();
         const now = Date.now();
         if (now - msg.timestamp > 24 * 60 * 60 * 1000) {
+          // auto-delete old messages
           remove(ref(db, "chat/" + snapshot.key));
           return;
         }
@@ -124,17 +116,12 @@
         div.classList.add("msg");
         div.innerHTML = `<b>${msg.user}:</b> ${msg.text}`;
         messagesDiv.appendChild(div);
-        scrollToBottom();
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
     }
 
-    // Scroll to bottom
-    function scrollToBottom() {
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    // Send message (with cooldown)
-    async function sendMessage() {
+    // Send message (with cooldown + length limit)
+    sendBtn.addEventListener("click", async () => {
       if (cooldown) return alert("⏳ Please wait before sending again!");
       const text = msgInput.value.trim();
       if (!text) return;
@@ -146,21 +133,14 @@
         timestamp: Date.now()
       });
 
-      msgInput.value = ""; // clear input after sending
+      msgInput.value = "";
       cooldown = true;
       sendBtn.disabled = true;
 
       setTimeout(() => {
         cooldown = false;
         sendBtn.disabled = false;
-      }, 7000); // 7 second cooldown
-    }
-
-    sendBtn.addEventListener("click", sendMessage);
-
-    // Allow Enter to send message
-    msgInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendMessage();
+      }, 7000);
     });
   </script>
 
@@ -223,33 +203,23 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      width: 100%;
-    }
-    #logoutBtn {
-      align-self: flex-end;
-      margin-bottom: 10px;
-      background: red;
-      color: white;
-    }
-    #toggleMode {
-      cursor: pointer;
-      color: orange;
     }
   </style>
 </head>
 <body>
   <!-- Login Screen -->
-  <div id="loginScreen">
+  <div id="loginScreen" style="display: flex;">
     <h2 id="title">Login</h2>
     <input type="text" id="username" placeholder="Username" />
     <input type="password" id="password" placeholder="Password" />
     <button id="loginBtn">Login</button>
-    <p id="toggleMode">Don't have an account? Sign up!</p>
+    <p id="toggleMode" style="cursor: pointer; color: orange;">
+      Don't have an account? Sign up!
+    </p>
   </div>
 
   <!-- Chat Screen -->
   <div id="chatScreen">
-    <button id="logoutBtn">Logout</button>
     <h2>Community Chat 💬</h2>
     <div id="messages"></div>
     <input id="msgInput" placeholder="Type a message..." maxlength="50" />
