@@ -6,105 +6,98 @@
   <title>beim.space — Community Chat</title>
 
   <style>
-    :root {
-      --bg: #0e0f12;
-      --panel: #131316;
-      --muted: #9aa6b2;
-      --accent: #00d4ff;
-      --btn: orange;
+    :root{
+      --bg:#0f2027;
+      --panel: rgba(255,255,255,0.03);
+      --muted:#9aa6b2;
+      --accent:#00d4ff;
+      --btn:orange;
     }
-    html,body { height:100%; margin:0; font-family: "Poppins", system-ui, sans-serif; background: radial-gradient(circle at bottom, #0f2027, #203a43, #2c5364); color:#eee; }
-    .wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; }
-    .card { width:100%; max-width:920px; background: rgba(255,255,255,0.03); border-radius:12px; padding:18px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); display:flex; gap:18px; flex-direction:column; }
-    .cols { display:flex; gap:18px; }
-    .left, .right { flex:1; min-width:250px; }
-    h1 { margin:0 0 6px 0; color:orange; text-shadow:0 0 12px rgba(255,140,0,0.25); }
-    p.muted { color:var(--muted); margin:6px 0 12px 0; }
-
-    /* Login UI */
-    .login { display:flex; gap:8px; flex-direction:column; align-items:center; padding:12px; }
-    .login input { width:220px; padding:10px 12px; border-radius:8px; border: none; outline:none; background: rgba(255,255,255,0.03); color:inherit; }
-    .login .btn { padding:10px 14px; border-radius:8px; cursor:pointer; border:none; background: var(--btn); color:#111; font-weight:700; }
-    .login .toggle { color:var(--btn); cursor:pointer; margin-top:8px; text-decoration:underline; background:none; border:none; }
-
-    /* Chat UI */
-    #messages { background: rgba(0,0,0,0.12); border-radius:10px; padding:12px; height:420px; overflow:auto; display:flex; flex-direction:column; gap:8px; }
-    .msg { padding:8px 10px; border-radius:8px; background: rgba(255,255,255,0.02); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.01); }
-    .msg .meta { font-size:0.82rem; color:var(--muted); display:flex; gap:8px; align-items:center; margin-bottom:6px; }
-    .msg .meta .name { font-weight:700; }
-    .composer { display:flex; gap:8px; margin-top:10px; align-items:center; }
-    .composer input { flex:1; padding:10px 12px; border-radius:8px; border:none; outline:none; background: rgba(255,255,255,0.03); color:inherit; }
-    .composer button { padding:10px 14px; border-radius:8px; border:none; background:var(--btn); color:#111; font-weight:700; cursor:pointer; }
-
-    /* Logout */
-    #logoutBtn { position:fixed; top:16px; right:16px; background:#ff4d4d; border:none; color:white; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; box-shadow:0 6px 18px rgba(255,0,0,0.08); }
-    #logoutBtn:hover { transform:translateY(-2px); }
-
-    /* small screens */
-    @media (max-width:820px) {
-      .cols { flex-direction:column; }
-      #messages { height: 320px; }
-    }
+    html,body{height:100%;margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto; background: radial-gradient(circle at bottom,#0f2027,#203a43,#2c5364); color:#eee}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+    .card{width:100%;max-width:1100px;background:var(--panel);border-radius:12px;padding:18px;box-shadow:0 12px 36px rgba(0,0,0,0.45);display:flex;gap:18px}
+    .left{flex:2;display:flex;flex-direction:column;gap:12px}
+    .right{flex:1;min-width:220px}
+    h1{margin:0;color:orange}
+    p.muted{color:var(--muted);margin:6px 0 0}
+    /* login */
+    .login { display:flex; gap:8px; flex-direction:column; align-items:flex-start; padding:10px; }
+    .login input{width:260px;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:inherit;outline:none}
+    .btn{padding:10px 14px;border-radius:8px;border:none;background:var(--btn);color:#111;cursor:pointer;font-weight:700}
+    .toggle{background:none;color:var(--btn);border:none;cursor:pointer;text-decoration:underline;padding:6px}
+    /* chat */
+    #messages{background:rgba(0,0,0,0.12);border-radius:10px;padding:12px;height:520px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+    .msg{padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.01)}
+    .meta{font-size:0.85rem;color:var(--muted);display:flex;gap:10px;align-items:center;margin-bottom:6px}
+    .meta .name{font-weight:700}
+    .composer{display:flex;gap:8px;margin-top:10px}
+    .composer input{flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:inherit;outline:none}
+    .small{font-size:0.9rem;color:var(--muted)}
+    /* online list */
+    .online-box{background:rgba(0,0,0,0.06);padding:12px;border-radius:10px;height:520px;overflow:auto}
+    .user-item{padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
+    /* logout */
+    #logoutBtn{position:fixed;top:16px;right:16px;background:#ff4d4d;border:none;color:white;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;display:none}
+    #logoutBtn:hover{transform:translateY(-2px)}
+    @media(max-width:880px){.card{flex-direction:column}.right{order:2}.left{order:1} #messages{height:320px}.online-box{height:200px}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <h1>Community Chat 💬</h1>
-          <p class="muted">Join the temporary chat. Messages auto-expire after 24 hours. 7s cooldown, 50 char max.</p>
+      <div class="left">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <h1>Community Chat 💬</h1>
+            <p class="muted">Temporary chat — messages auto-expire after 24h. 7s cooldown. 50 chars max.</p>
+          </div>
+          <div id="youLabel" class="small">Not signed in</div>
         </div>
-        <div style="text-align:right; color:var(--muted); font-size:0.9rem;">
-          <div id="youLabel">Not signed in</div>
+
+        <!-- LOGIN BOX -->
+        <div id="loginBox" class="login" style="margin-top:6px">
+          <input id="usernameInput" placeholder="Username (3–20 chars)" maxlength="20" />
+          <input id="passwordInput" type="password" placeholder="Password (min 3 chars)" />
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="authBtn" class="btn">Login</button>
+            <button id="modeBtn" class="toggle">Switch to Sign up</button>
+            <div id="authNotice" class="small" style="margin-left:12px;color:#ffb86b"></div>
+          </div>
+        </div>
+
+        <!-- CHAT BOX (hidden until logged) -->
+        <div id="chatBox" style="display:none; margin-top:6px">
+          <div id="messages" aria-live="polite"></div>
+
+          <div class="composer" style="margin-top:12px">
+            <input id="msgInput" placeholder="Write message... (max 50 chars)" maxlength="50" autocomplete="off" />
+            <button id="sendBtn" class="btn">Send</button>
+          </div>
         </div>
       </div>
 
-      <div class="cols">
-        <div class="left">
-          <!-- LOGIN / REGISTER -->
-          <div id="loginBox" class="login">
-            <input id="inpUser" placeholder="Username (3–20 chars)" maxlength="20" />
-            <input id="inpPass" type="password" placeholder="Password (min 3 chars)" />
-            <div style="display:flex;gap:8px;">
-              <button id="btnAuth" class="btn">Login</button>
-              <button id="btnMode" class="toggle">Switch to Sign up</button>
-            </div>
-            <div id="authMsg" style="color:#ffb86b; font-size:0.9rem; margin-top:8px;"></div>
-          </div>
-        </div>
-
-        <div class="right">
-          <!-- CHAT -->
-          <div id="chatBox" style="display:none;">
-            <div id="messages" aria-live="polite"></div>
-
-            <div class="composer">
-              <input id="msgInput" placeholder="Type your message... (max 50 chars)" maxlength="50" />
-              <button id="sendBtn">Send</button>
-            </div>
-          </div>
+      <!-- RIGHT: online users -->
+      <div class="right">
+        <div style="margin-bottom:8px"><strong class="small">Online now</strong></div>
+        <div id="onlineList" class="online-box">
+          <div class="small" id="noOnline">No one online</div>
         </div>
       </div>
     </div>
   </div>
 
-  <button id="logoutBtn" style="display:none;">Logout</button>
+  <button id="logoutBtn">Logout</button>
 
-  <!-- Firebase + App script -->
+  <!-- Firebase + app -->
   <script type="module">
-    // wrap so DOM elements exist
     document.addEventListener('DOMContentLoaded', async () => {
-
-      // import firebase modules
+      // dynamic imports
       const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js');
       const {
-        getDatabase, ref, push, onChildAdded, set, get, query, orderByChild, remove
+        getDatabase, ref, push, onChildAdded, onValue, set, get, remove, query, orderByChild
       } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js');
 
-      // ---------------------------
-      // === CONFIG - use your Firebase project config (already set) ===
-      // ---------------------------
+      // ---------- config (your project) ----------
       const firebaseConfig = {
         apiKey: "AIzaSyDnoJBLK4l7gokAz7d78gtZSi5sT5a8lXQ",
         authDomain: "beim-notes.firebaseapp.com",
@@ -118,16 +111,18 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
-      const chatRefRoot = ref(db, 'chat'); // messages node
 
-      // ---------------------------
-      // === UI refs ===
-      // ---------------------------
-      const inpUser = document.getElementById('inpUser');
-      const inpPass = document.getElementById('inpPass');
-      const btnAuth = document.getElementById('btnAuth');
-      const btnMode = document.getElementById('btnMode');
-      const authMsg = document.getElementById('authMsg');
+      // nodes
+      const messagesRef = ref(db, 'chat');          // messages
+      const usersRef = ref(db, 'users');            // simple user store (passwords hashed)
+      const presenceRef = ref(db, 'presence');      // who is online
+
+      // UI refs
+      const usernameInput = document.getElementById('usernameInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const authBtn = document.getElementById('authBtn');
+      const modeBtn = document.getElementById('modeBtn');
+      const authNotice = document.getElementById('authNotice');
       const loginBox = document.getElementById('loginBox');
       const chatBox = document.getElementById('chatBox');
       const messagesEl = document.getElementById('messages');
@@ -135,317 +130,239 @@
       const sendBtn = document.getElementById('sendBtn');
       const logoutBtn = document.getElementById('logoutBtn');
       const youLabel = document.getElementById('youLabel');
+      const onlineList = document.getElementById('onlineList');
+      const noOnline = document.getElementById('noOnline');
 
-      // ---------------------------
-      // === state ===
-      // ---------------------------
-      let isLoginMode = true; // toggle login / signup
+      let isLoginMode = true;
       let currentUser = null;
-      let sendingLocked = false; // cooldown lock
+      let locked = false; // cooldown
 
-      // deterministic color for username
-      function getUsernameColor(name) {
-        let hash = 0;
-        for (let i = 0; i < name.length; i++) {
-          hash = name.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        const hue = Math.abs(hash) % 360;
-        return `hsl(${hue} 70% 60%)`;
+      // small utilities
+      function hashPassword(s){ return btoa(s.split('').reverse().join('')); } // small obfuscation
+      function usernameColor(name){
+        let h=0;
+        for(let i=0;i<name.length;i++) h = name.charCodeAt(i) + ((h<<5)-h);
+        return `hsl(${Math.abs(h)%360} 70% 60%)`;
       }
 
-      // simple hash (not secure, just to store)
-      function hashPassword(s) {
-        return btoa(s.split('').reverse().join('')); // tiny obfuscation
-      }
-
-      // toggle mode UI
-      btnMode.addEventListener('click', () => {
+      // toggle login/signup
+      modeBtn.addEventListener('click', () => {
         isLoginMode = !isLoginMode;
-        btnAuth.textContent = isLoginMode ? 'Login' : 'Sign up';
-        btnMode.textContent = isLoginMode ? 'Switch to Sign up' : 'Switch to Login';
-        authMsg.textContent = '';
+        authBtn.textContent = isLoginMode ? 'Login' : 'Sign up';
+        modeBtn.textContent = isLoginMode ? 'Switch to Sign up' : 'Switch to Login';
+        authNotice.textContent = '';
       });
 
-      // helper to update UI when logged
-      function setLoggedIn(user) {
+      // show/hide UI helpers
+      function showChatUI(user){
         currentUser = user;
-        localStorage.setItem('chatUser', user);
         loginBox.style.display = 'none';
         chatBox.style.display = 'block';
         logoutBtn.style.display = 'inline-block';
-        youLabel.textContent = `You: ${user}`;
+        youLabel.textContent = 'You: ' + user;
         msgInput.focus();
-        startListening(); // start realtime
+        attachPresence(user);
+        startListeningMessages();
+        startListeningPresence();
       }
 
-      // auto-login if stored
-      const saved = localStorage.getItem('chatUser');
-      if (saved) {
-        // set right away
-        setLoggedIn(saved);
+      // Auto-login if localStorage has user
+      const stored = localStorage.getItem('chatUser');
+      if(stored){
+        showChatUI(stored);
       }
 
-      // AUTH (register/login)
-      btnAuth.addEventListener('click', async () => {
-        const username = (inpUser.value || '').trim();
-        const pass = (inpPass.value || '').trim();
+      // AUTH (login or sign up)
+      authBtn.addEventListener('click', async () => {
+        const u = (usernameInput.value || '').trim();
+        const p = (passwordInput.value || '').trim();
+        if(u.length < 3 || u.length > 20){ authNotice.textContent = 'Username 3–20 chars'; return; }
+        if(p.length < 3){ authNotice.textContent = 'Password min 3 chars'; return; }
+        authNotice.textContent = '...';
 
-        if (username.length < 3 || username.length > 20) {
-          authMsg.textContent = 'Username must be 3–20 chars.';
-          return;
-        }
-        if (pass.length < 3) {
-          authMsg.textContent = 'Password must be at least 3 chars.';
-          return;
-        }
-        authMsg.textContent = '...';
-
-        const usersRef = ref(db, 'users/' + username);
-        try {
-          const snap = await get(usersRef);
-          if (isLoginMode) {
-            // login
-            if (!snap.exists()) {
-              authMsg.textContent = 'User not found.';
-              return;
-            }
-            const storedHash = snap.val().password;
-            if (storedHash !== hashPassword(pass)) {
-              authMsg.textContent = 'Wrong password.';
-              return;
-            }
-            authMsg.textContent = '';
-            setLoggedIn(username);
+        try{
+          const userRef = ref(db, 'users/' + u);
+          const snap = await get(userRef);
+          if(isLoginMode){
+            if(!snap.exists()){ authNotice.textContent = 'User not found'; return; }
+            if(snap.val().password !== hashPassword(p)){ authNotice.textContent = 'Wrong password'; return; }
+            // success
+            localStorage.setItem('chatUser', u);
+            authNotice.textContent = '';
+            showChatUI(u);
           } else {
-            // sign up
-            if (snap.exists()) {
-              authMsg.textContent = 'Username already taken.';
-              return;
-            }
-            // save hashed pass
-            await set(usersRef, { password: hashPassword(pass) });
-            authMsg.textContent = '';
-            setLoggedIn(username);
+            // sign-up
+            if(snap.exists()){ authNotice.textContent = 'Username taken'; return; }
+            await set(userRef, { password: hashPassword(p) });
+            localStorage.setItem('chatUser', u);
+            authNotice.textContent = '';
+            showChatUI(u);
           }
-        } catch (err) {
+        } catch(err){
           console.error(err);
-          authMsg.textContent = 'Network error.';
+          authNotice.textContent = 'Network error';
         }
       });
 
       // LOGOUT
-      logoutBtn.addEventListener('click', () => {
+      logoutBtn.addEventListener('click', async () => {
+        // remove presence entry if exists
+        const user = localStorage.getItem('chatUser');
+        if(user) {
+          try { await remove(ref(db, 'presence/' + user)); } catch(e){ /*ignore*/ }
+        }
         localStorage.removeItem('chatUser');
-        // reload to reset state
         location.reload();
       });
 
-      // --------------------------------
-      // == Real-time message handling ==
-      // --------------------------------
-      // Display a message node
-      function renderMessage(obj) {
-        const now = Date.now();
-        // if too old -> try to remove from DB
-        if (now - obj.timestamp > 24 * 60 * 60 * 1000) {
-          // old message; don't render
-          return;
-        }
-
-        const div = document.createElement('div');
-        div.className = 'msg';
-
-        const nameColor = getUsernameColor(obj.user || 'anon');
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'name';
-        nameSpan.textContent = obj.user || 'anon';
-        nameSpan.style.color = nameColor;
-
-        const timeSpan = document.createElement('span');
-        timeSpan.textContent = obj.time || '';
-        timeSpan.style.marginLeft = '8px';
-        timeSpan.style.color = 'var(--muted)';
-
-        meta.appendChild(nameSpan);
-        meta.appendChild(timeSpan);
-
-        const text = document.createElement('div');
-        text.className = 'text';
-        text.textContent = obj.text || '';
-
-        div.appendChild(meta);
-        div.appendChild(text);
-
-        messagesEl.appendChild(div);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
+      // presence: set presence and onDisconnect remove it
+      async function attachPresence(user){
+        try{
+          const pRef = ref(db, 'presence/' + user);
+          // set presence (value is timestamp)
+          await set(pRef, { ts: Date.now() });
+          // onDisconnect remove
+          // Firebase JS Realtime needs onDisconnect API - dynamic import for it:
+          const { onDisconnect } = await import('https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js');
+          const od = onDisconnect(pRef);
+          od.remove().catch(()=>{});
+        }catch(e){ console.warn('presence failed', e); }
       }
 
-      // remove old messages on load (scan once)
-      async function cleanupOldMessages() {
-        try {
-          // We'll listen once to recent messages and remove those older than 24h
-          const q = query(chatRefRoot, orderByChild('timestamp'));
-          // onChildAdded below handles removal for any old ones as they arrive,
-          // but we can also leave cleanup to that logic.
-        } catch (e) {
-          console.warn('cleanup error', e);
-        }
-      }
-
-      // start listening for real-time messages
-      let started = false;
-      function startListening() {
-        if (started) return;
-        started = true;
-
-        // Listen to all messages, ordered by timestamp
-        const q = query(chatRefRoot, orderByChild('timestamp'));
-        onChildAdded(q, async (snap) => {
-          const msg = snap.val();
-          const key = snap.key;
-
-          // If message is older than 24h, remove it immediately
-          const now = Date.now();
-          if (now - (msg.timestamp || 0) > 24 * 60 * 60 * 1000) {
-            try { await remove(ref(db, 'chat/' + key)); } catch(e){ /* ignore */ }
+      // listen presence list
+      function startListeningPresence(){
+        const pRef = ref(db, 'presence');
+        onValue(pRef, (snap) => {
+          const data = snap.val() || {};
+          onlineList.innerHTML = '';
+          const names = Object.keys(data);
+          if(names.length === 0){
+            noOnline.style.display = 'block';
             return;
           }
-
-          // Render
-          renderMessage(msg);
+          noOnline.style.display = 'none';
+          names.forEach(n => {
+            const item = document.createElement('div');
+            item.className = 'user-item';
+            const left = document.createElement('div');
+            const colorDot = document.createElement('span');
+            colorDot.style.display = 'inline-block';
+            colorDot.style.width = '10px';
+            colorDot.style.height = '10px';
+            colorDot.style.marginRight = '8px';
+            colorDot.style.borderRadius = '50%';
+            colorDot.style.background = usernameColor(n);
+            left.appendChild(colorDot);
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = n;
+            left.appendChild(nameSpan);
+            const tsSpan = document.createElement('div');
+            tsSpan.style.color = 'var(--muted)';
+            tsSpan.style.fontSize = '0.85rem';
+            const ago = Date.now() - (data[n].ts || 0);
+            tsSpan.textContent = ago < 60000 ? 'now' : Math.round(ago/60000) + 'm';
+            item.appendChild(left);
+            item.appendChild(tsSpan);
+            onlineList.appendChild(item);
+          });
         });
       }
 
-      // Send function (with cooldown and checks)
-      async function sendMessage() {
-        if (!currentUser) return;
-        if (sendingLocked) {
-          // show small feedback
-          authMsg.textContent = '⏳ Wait before sending again...';
-          setTimeout(()=> authMsg.textContent = '', 1500);
+      // messages: listen and render
+      let messagesStarted = false;
+      function startListeningMessages(){
+        if(messagesStarted) return;
+        messagesStarted = true;
+        // order by timestamp
+        const q = query(messagesRef, orderByChild('timestamp'));
+        onChildAdded(q, async (snap) => {
+          const obj = snap.val();
+          const key = snap.key;
+          if(!obj) return;
+          // auto-remove if >24h
+          const age = Date.now() - (obj.timestamp || 0);
+          if(age > 24*60*60*1000){
+            try{ await remove(ref(db, 'chat/' + key)); } catch(e){}
+            return;
+          }
+          renderMessage(obj);
+        });
+      }
+
+      // render message element
+      function renderMessage(obj){
+        const d = document.createElement('div');
+        d.className = 'msg';
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const name = document.createElement('span');
+        name.className = 'name';
+        name.textContent = obj.user || 'anon';
+        name.style.color = usernameColor(obj.user || 'anon');
+        const time = document.createElement('span');
+        time.textContent = obj.time || '';
+        time.style.marginLeft = '8px';
+        meta.appendChild(name);
+        meta.appendChild(time);
+        const text = document.createElement('div');
+        text.textContent = obj.text || '';
+        d.appendChild(meta);
+        d.appendChild(text);
+        messagesEl.appendChild(d);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      // send message
+      async function sendMessage(){
+        if(!localStorage.getItem('chatUser')) return;
+        if(locked) {
+          authNotice.textContent = '⏳ Wait before sending...';
+          setTimeout(()=> authNotice.textContent = '',1500);
           return;
         }
         const text = (msgInput.value || '').trim();
-        if (!text) return;
-        if (text.length > 50) {
-          authMsg.textContent = 'Max 50 characters.';
-          setTimeout(()=> authMsg.textContent = '', 1500);
-          return;
-        }
-
+        if(!text) return;
+        if(text.length > 50){ authNotice.textContent = 'Max 50 chars'; setTimeout(()=> authNotice.textContent='',1500); return; }
+        const user = localStorage.getItem('chatUser');
         const now = new Date();
         const hh = String(now.getHours()).padStart(2,'0');
         const mm = String(now.getMinutes()).padStart(2,'0');
-
-        try {
-          await push(chatRefRoot, {
-            user: currentUser,
+        try{
+          await push(messagesRef, {
+            user: user,
             text: text,
-            time: `${hh}:${mm}`,
+            time: hh + ':' + mm,
             timestamp: now.getTime()
           });
           msgInput.value = '';
-          sendingLocked = true;
+          locked = true;
           sendBtn.disabled = true;
-          setTimeout(() => { sendingLocked = false; sendBtn.disabled = false; }, 7000);
-        } catch (e) {
+          setTimeout(()=>{ locked = false; sendBtn.disabled = false; }, 7000);
+        }catch(e){
           console.error('send failed', e);
-          authMsg.textContent = 'Send failed.';
-          setTimeout(()=> authMsg.textContent = '', 1500);
+          authNotice.textContent = 'Failed to send';
+          setTimeout(()=> authNotice.textContent = '',1500);
         }
       }
 
-      // send on button click
+      // Enter to send
+      msgInput.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter'){ e.preventDefault(); sendMessage(); }
+      });
       sendBtn.addEventListener('click', sendMessage);
 
-      // send on Enter
-      msgInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          sendMessage();
-        }
-      });
-
-      // If user is already logged (auto-login), ensure currentUser set and start listening.
-      const stored = localStorage.getItem('chatUser');
-      if (stored) {
-        currentUser = stored;
+      // small helper: if user already logged before page loaded
+      if(localStorage.getItem('chatUser')){
+        // UI already switched in showChatUI called earlier? ensure:
         loginBox.style.display = 'none';
         chatBox.style.display = 'block';
         logoutBtn.style.display = 'inline-block';
-        youLabel.textContent = `You: ${currentUser}`;
-        startListening();
+        youLabel.textContent = 'You: ' + localStorage.getItem('chatUser');
+        attachPresence(localStorage.getItem('chatUser'));
+        startListeningMessages();
+        startListeningPresence();
       }
 
-      // Small UX: focus input after login
-      // when user logs in via btnAuth -> setLoggedIn behavior handled earlier; to ensure setLoggedIn called here:
-      // (we used a simple flow above: after success we called setLoggedIn via setLoggedIn invoked in btnAuth success branch)
-      // But setLoggedIn is defined earlier in that branch, so to keep flow consistent we duplicate minimal step:
-      // Actually above we haven't defined setLoggedIn in this module scope (we used local setLoggedIn earlier in other draft). Implement a small helper:
-      function doSetLoggedIn(u) {
-        currentUser = u;
-        localStorage.setItem('chatUser', u);
-        loginBox.style.display = 'none';
-        chatBox.style.display = 'block';
-        logoutBtn.style.display = 'inline-block';
-        youLabel.textContent = `You: ${u}`;
-        msgInput.focus();
-        startListening();
-      }
-
-      // Replace earlier setLoggedIn reference inside auth code: but we didn't call setLoggedIn above because we used local setLoggedIn earlier.
-      // To be safe, patch btnAuth listener to call doSetLoggedIn when successful.
-      // We'll override the previous btnAuth listener by reattaching it here (safe):
-      btnAuth.removeEventListener('click', ()=>{}); // no-op safe
-      btnAuth.addEventListener('click', async () => {
-        const username = (inpUser.value || '').trim();
-        const pass = (inpPass.value || '').trim();
-
-        if (username.length < 3 || username.length > 20) {
-          authMsg.textContent = 'Username must be 3–20 chars.';
-          return;
-        }
-        if (pass.length < 3) {
-          authMsg.textContent = 'Password must be at least 3 chars.';
-          return;
-        }
-        authMsg.textContent = '...';
-
-        const usersRef = ref(db, 'users/' + username);
-        try {
-          const snap = await get(usersRef);
-          if (isLoginMode) {
-            // login
-            if (!snap.exists()) {
-              authMsg.textContent = 'User not found.';
-              return;
-            }
-            const storedHash = snap.val().password;
-            if (storedHash !== hashPassword(pass)) {
-              authMsg.textContent = 'Wrong password.';
-              return;
-            }
-            authMsg.textContent = '';
-            doSetLoggedIn(username);
-          } else {
-            // sign up
-            if (snap.exists()) {
-              authMsg.textContent = 'Username already taken.';
-              return;
-            }
-            await set(usersRef, { password: hashPassword(pass) });
-            authMsg.textContent = '';
-            doSetLoggedIn(username);
-          }
-        } catch (err) {
-          console.error(err);
-          authMsg.textContent = 'Network error.';
-        }
-      });
-
-      // done DOMContentLoaded
     }); // DOMContentLoaded
   </script>
 </body>
