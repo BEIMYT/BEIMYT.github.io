@@ -41,6 +41,9 @@
 
     const logoutBtn = document.getElementById("logoutBtn");
 
+    // ToS Modal elements (added later via HTML)
+    let tosModal, tosOverlay, tosAcknowledgeBtn;
+
     let isLoginMode = true;
     let currentUser = null;
     let cooldown = false;
@@ -61,6 +64,23 @@
       return btoa(str.split("").reverse().join(""));
     }
 
+    // Terms of Service Modal Logic
+    function showTOSModalIfNeeded(thenShowChat) {
+      if (localStorage.getItem("chatTOSAccepted") === "true") {
+        thenShowChat();
+        return;
+      }
+      tosOverlay.style.display = "flex";
+      tosModal.style.display = "flex";
+      tosAcknowledgeBtn.focus();
+      tosAcknowledgeBtn.onclick = () => {
+        tosOverlay.style.display = "none";
+        tosModal.style.display = "none";
+        localStorage.setItem("chatTOSAccepted", "true");
+        thenShowChat();
+      };
+    }
+
     // Register / Login
     loginBtn.addEventListener("click", async () => {
       const username = usernameInput.value.trim();
@@ -77,14 +97,14 @@
           return alert("Wrong password!");
         currentUser = username;
         localStorage.setItem("chatUser", username);
-        showChat();
+        showTOSModalIfNeeded(showChat);
       } else {
         // Register
         if (snap.exists()) return alert("Username already taken!");
         await set(userRef, { password: hashPassword(password) });
         currentUser = username;
         localStorage.setItem("chatUser", username);
-        showChat();
+        showTOSModalIfNeeded(showChat);
       }
     });
 
@@ -100,7 +120,7 @@
       const savedUser = localStorage.getItem("chatUser");
       if (savedUser) {
         currentUser = savedUser;
-        showChat();
+        showTOSModalIfNeeded(showChat);
       }
     });
 
@@ -203,6 +223,47 @@
       cooldownNotice.textContent = '';
       cooldown = false;
     });
+
+    // ToS Modal DOM injection (runs immediately)
+    (() => {
+      // Create the modal overlay and modal
+      tosOverlay = document.createElement("div");
+      tosOverlay.id = "tosOverlay";
+      tosOverlay.style = "display:none;position:fixed;z-index:1000;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.68);align-items:center;justify-content:center;";
+      
+      tosModal = document.createElement("div");
+      tosModal.id = "tosModal";
+      tosModal.style = "display:none;flex-direction:column;gap:22px;padding:35px 24px 28px 24px;background:linear-gradient(100deg,#1f1c28 80%,#23282f 100%);border-radius:16px;box-shadow:0 10px 40px #000a;border:2px solid orange;max-width:96vw;width:400px;align-items:center;";
+      
+      // Modal title
+      const tosTitle = document.createElement("h3");
+      tosTitle.textContent = "Terms of Service for Posting";
+      tosTitle.style = "margin:0 0 10px 0;font-size:1.24em;font-weight:600;color:orange;text-align:center;";
+      tosModal.appendChild(tosTitle);
+      
+      // Modal content (ToS)
+      const tosContent = document.createElement("ul");
+      tosContent.style = "color:#ffeccb;font-size:1.02em;line-height:1.5;text-align:left;margin:0 0 8px 0;padding-left:15px;";
+      tosContent.innerHTML = `
+        <li><b>Consent to Ownership:</b> You grant the website owner <b>(BEIM)</b> the right to use your messages in any manner, both within and outside the website.</li>
+        <li><b>No Editing or Deletion:</b> You acknowledge that you cannot edit nor delete your posted messages. While you may request the owner to delete a message, the owner is not obligated to comply.</li>
+        <li><b>Public Visibility:</b> You understand that every message you post will be visible to anyone who visits the website, including the owner (BEIM). Also keep in mind that every message stays up for 24h. After that they get deleted.</li>
+      `;
+      tosModal.appendChild(tosContent);
+      
+      // "I understand" button
+      tosAcknowledgeBtn = document.createElement("button");
+      tosAcknowledgeBtn.textContent = "I understand";
+      tosAcknowledgeBtn.style = "padding:11px 30px;background:orange;color:#19162a;font-weight:700;border-radius:7px;text-shadow:0 1px 2px #fff7;box-shadow:0 1px 7px #19162a57;font-size:1.05em;border:none;cursor:pointer;margin-top:8px;";
+      tosAcknowledgeBtn.tabIndex = 0;
+      tosAcknowledgeBtn.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") tosAcknowledgeBtn.click();
+      });
+      tosModal.appendChild(tosAcknowledgeBtn);
+
+      tosOverlay.appendChild(tosModal);
+      document.body.appendChild(tosOverlay);
+    })();
   </script>
 
   <style>
@@ -297,6 +358,11 @@
       background: linear-gradient(90deg, #ec4899 40%, #ff9800 100%);
       transform: translateY(-2px) scale(1.03);
     }
+    /* ToS Modal Styling */
+    #tosOverlay {
+      /* style is set inline for critical modal, but can be extended here */
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -320,5 +386,6 @@
     <div id="cooldownNotice"></div>
     <button id="sendBtn">Send</button>
   </div>
+  <!-- ToS Modal is injected via JS -->
 </body>
 </html>
