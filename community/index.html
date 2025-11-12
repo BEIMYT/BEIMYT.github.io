@@ -31,6 +31,7 @@
     const messagesDiv = document.getElementById("messages");
     const msgInput = document.getElementById("msgInput");
     const sendBtn = document.getElementById("sendBtn");
+    const cooldownNotice = document.getElementById("cooldownNotice");
 
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
@@ -38,12 +39,12 @@
     const loginBtn = document.getElementById("loginBtn");
     const title = document.getElementById("title");
 
-    // Logout button
     const logoutBtn = document.getElementById("logoutBtn");
 
     let isLoginMode = true;
     let currentUser = null;
     let cooldown = false;
+    let cooldownTimer = null;
 
     // Toggle login/register
     toggleMode.addEventListener("click", () => {
@@ -144,32 +145,43 @@
       });
     }
 
+    // Cooldown handling
+    function startCooldown(seconds) {
+      cooldown = true;
+      sendBtn.disabled = true;
+      let remaining = seconds;
+      cooldownNotice.textContent = `Please wait ${remaining}s before sending another message.`;
+      cooldownTimer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(cooldownTimer);
+          cooldown = false;
+          sendBtn.disabled = false;
+          cooldownNotice.textContent = '';
+        } else {
+          cooldownNotice.textContent = `Please wait ${remaining}s before sending another message.`;
+        }
+      }, 1000);
+    }
+
     // Send message (with cooldown + length limit)
     sendBtn.addEventListener("click", async () => {
-      if (cooldown) return alert("⏳ Please wait before sending again!");
+      if (cooldown) return;
       const text = msgInput.value.trim();
       if (!text) return;
       if (text.length > 50) return alert("Max 50 characters!");
-
       await push(ref(db, "chat"), {
         user: currentUser,
         text: text,
         timestamp: Date.now()
       });
-
       msgInput.value = ""; // Clear input
-      cooldown = true;
-      sendBtn.disabled = true;
-
-      setTimeout(() => {
-        cooldown = false;
-        sendBtn.disabled = false;
-      }, 7000);
+      startCooldown(7);
     });
 
-    // Send message when Enter is pressed in msgInput
+    // Send message when Enter is pressed in msgInput (but only if not on cooldown)
     msgInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
+      if (event.key === "Enter" && !sendBtn.disabled && !cooldown) {
         event.preventDefault();
         sendBtn.click();
       }
@@ -186,6 +198,10 @@
       loginScreen.style.display = "flex";
       usernameInput.value = "";
       passwordInput.value = "";
+      if (cooldownTimer) clearInterval(cooldownTimer);
+      sendBtn.disabled = false;
+      cooldownNotice.textContent = '';
+      cooldown = false;
     });
   </script>
 
@@ -249,6 +265,16 @@
       flex-direction: column;
       align-items: center;
     }
+    /* Cooldown Notice Styling */
+    #cooldownNotice {
+      color: orange;
+      min-height: 20px;
+      font-size: 0.95em;
+      margin-bottom: 4px;
+      text-align: center;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
     /* Logout Button Styling */
     #logoutBtn {
       align-self: flex-end;
@@ -291,6 +317,7 @@
     <h2>Community Chat 💬</h2>
     <div id="messages"></div>
     <input id="msgInput" placeholder="Type a message..." maxlength="50" />
+    <div id="cooldownNotice"></div>
     <button id="sendBtn">Send</button>
   </div>
 </body>
