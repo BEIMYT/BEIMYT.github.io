@@ -39,7 +39,9 @@
     const loginBtn = document.getElementById("loginBtn");
     const title = document.getElementById("title");
 
+    const reminderMsg = document.getElementById("reminderMsg");
     const logoutBtn = document.getElementById("logoutBtn");
+    const chatCeilingReminder = document.getElementById("chatCeilingReminder");
 
     // ToS Modal elements (added later via HTML)
     let tosModal, tosOverlay, tosAcknowledgeBtn;
@@ -69,6 +71,7 @@
       toggleMode.textContent = isLoginMode
         ? "Don't have an account? Sign up!"
         : "Already have an account? Login!";
+      // No need to change reminder, stays the same
     });
 
     // Hash passwords (simple client-side)
@@ -245,7 +248,7 @@
       tosContent.innerHTML = `
         <li><b>Consent to Ownership:</b> You grant the website owner <b>(BEIM)</b> the right to use your messages&credentials in any manner, both within and outside the website.</li>
         <li><b>No Editing or Deletion:</b> You acknowledge that you cannot edit nor delete your posted messages. While you may request the owner to delete a message, the owner is not obligated to comply.</li>
-        <li><b>Public Visibility:</b> You understand that every message you post will be visible to anyone who visits the website, including the owner (BEIM). Also keep in mind that every message stays up for 24h. After that they get deleted from the database.</li>
+        <li><b>Public Visibility:</b> You understand that every message you post will be visible to anyone who visits the website, including the owner (BEIM). Also keep in mind that every message stays up for 24h. After that they get deleted.</li>
       `;
       tosModal.appendChild(tosContent);
       
@@ -323,6 +326,17 @@
       display: none;
       flex-direction: column;
       align-items: center;
+      padding-top: 36px; /* Add padding here to fix logout button cut off */
+    }
+    /* Chat reminder about 24h deletion */
+    #chatCeilingReminder {
+      color: #ee2222;
+      font-size: 0.98em;
+      font-weight: 600;
+      margin-bottom: 14px;
+      margin-top: -22px;
+      text-align: center;
+      letter-spacing: 0.01em;
     }
     /* Cooldown Notice Styling */
     #cooldownNotice {
@@ -333,6 +347,17 @@
       text-align: center;
       font-weight: 500;
       letter-spacing: 0.02em;
+    }
+    /* Reminder message styling */
+    #reminderMsg {
+      color: #ee2222;
+      margin-top: 6px;
+      font-size: 0.97em;
+      user-select: none;
+      text-align: center;
+      letter-spacing: 0.02em;
+      opacity: 0.95;
+      font-weight: 600;
     }
     /* Logout Button Styling */
     #logoutBtn {
@@ -370,9 +395,8 @@
     <input type="text" id="username" placeholder="Username" />
     <input type="password" id="password" placeholder="Password" />
     <button id="loginBtn">Login</button>
-    
-    <div id="reminderMsg" style="color: red;">Remember to refresh the page after signing in!</div>
-    
+    <!-- Reminder message -->
+    <div id="reminderMsg">remember to refresh page after signing in</div>
     <p id="toggleMode" style="cursor: pointer; color: orange;">
       Don't have an account? Sign up!
     </p>
@@ -380,9 +404,9 @@
 
   <!-- Chat Screen -->
   <div id="chatScreen">
+    <div id="chatCeilingReminder">REMEMBER: Messages are deleted after 24 hours!</div>
     <button id="logoutBtn">Logout</button>
     <h2>Community Chat 💬</h2>
-    <h4 style="color: red;">Every 24h your messages get deleted!</h4>
     <div id="messages"></div>
     <input id="msgInput" placeholder="Type a message..." maxlength="50" />
     <div id="cooldownNotice"></div>
@@ -391,6 +415,3 @@
   <!-- ToS Modal is injected via JS -->
 </body>
 </html>
-
-
-
