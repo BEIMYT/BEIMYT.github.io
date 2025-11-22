@@ -242,9 +242,10 @@ logoutBtn.addEventListener("click", () => {
   const tosContent = document.createElement("ul");
   tosContent.style = "color:#ffeccb;text-align:left;";
   tosContent.innerHTML = `
-    <li><b>Consent to Ownership:</b> You grant the website owner (BEIM) rights to posted content.</li>
-    <li><b>No Editing or Deletion:</b> You cannot edit or delete messages.</li>
-    <li><b>Public Visibility:</b> Messages are visible publicly & auto-delete after 24h.</li>`;
+    <li><b>Consent to Ownership:</b> You grant the website owner (BEIM) the rights to use messages and credentials both outside & inside the website.</li>
+    <li><b>No Editing or Deletion:</b> You understand that you cannon edit nor delete posted messages. While you may ask the website owner to delete a message he is not obligated to comply.</li>
+    <li><b>Public Visibility:</b> Messages are visible publicly to anyone who visites the website and creates an acount or logs in. Also messages get auto-delete after 24h from both the website and the database.</li>`;
+    <i><b>Last updated: 22/11/2025 11:57am UTC +2</b></i>
   tosModal.appendChild(tosContent);
 
   tosAcknowledgeBtn = document.createElement("button");
@@ -313,3 +314,4 @@ button {
 
 </body>
 </html>
+
