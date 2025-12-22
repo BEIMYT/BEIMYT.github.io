@@ -87,6 +87,7 @@ Also I made my own DDNet server "<i>TeeSpace | SlowHub</i>" it's called!
      <section>
         <h2>Latest update included:</h2>
         <p>• Updated "About This Site" section.
+        <p>• Added Seasonal Quotes.
         <h4><i>You can check the progress <a href= "https://github.com/BEIMYT/BEIMYT.github.io" target="_blank">here</a></i></h4>
         
      </section>
@@ -326,6 +327,27 @@ document.addEventListener("DOMContentLoaded", () => {
     lastTime = now;
   }, { passive: true });
 });
+</script>
+<script>
+  const seasonalMessages = [
+    "currently building things that may or may not work",
+    "this site changes when motivation hits",
+    "temporary thoughts, permanent internet",
+    "if you're here, something is probably being tested",
+    "still under construction mentally",
+    "updates every two days, like my sleep schedule"
+  ];
+
+  const TWO_DAYS = 1000 * 60 * 60 * 24 * 2;
+  const startDate = new Date("2024-01-01").getTime();
+  const now = Date.now();
+
+  const index = Math.floor((now - startDate) / TWO_DAYS) % seasonalMessages.length;
+
+  const el = document.getElementById("seasonal-message");
+  if (el) {
+    el.textContent = seasonalMessages[index];
+  }
 </script>
 
 </body>
