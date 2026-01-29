@@ -1,91 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Glossa – Online Interpreter</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Glossa Online</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.png">
 
-  <link rel="icon" href="favicon.png">
+<style>
+body {
+  font-family: monospace;
+  background: #2c0202;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+}
 
-  <style>
-    body {
-      font-family: monospace;
-      background: #2c0202;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
+.editor {
+  display: flex;
+  width: 90%;
+  margin: auto;
+  border: 1px solid #aa4444;
+  background: #120000;
+}
 
-    textarea {
-      width: 90%;
-      height: 240px;
-      background: #120000;
-      color: #fff;
-      border: 1px solid #aa4444;
-      padding: 10px;
-      font-size: 15px;
-    }
+.lines {
+  padding: 10px;
+  color: #aa6666;
+  text-align: right;
+  user-select: none;
+}
 
-    button {
-      margin: 15px;
-      padding: 10px 25px;
-      font-size: 16px;
-      background: #aa4444;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+textarea {
+  flex: 1;
+  background: transparent;
+  color: white;
+  border: none;
+  resize: none;
+  padding: 10px;
+  font-size: 15px;
+  outline: none;
+}
 
-    button:hover {
-      background: #cc6666;
-    }
+button {
+  margin: 15px;
+  padding: 10px 25px;
+  background: #aa4444;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
 
-    pre {
-      width: 90%;
-      margin: auto;
-      background: #120000;
-      border: 1px solid #aa4444;
-      padding: 10px;
-      min-height: 120px;
-      text-align: left;
-      white-space: pre-wrap;
-    }
+button:hover {
+  background: #cc6666;
+}
 
-    .btn-github {
-      margin-top: 25px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: white;
-      text-decoration: none;
-      transition: transform 0.3s ease;
-    }
+pre {
+  width: 90%;
+  margin: auto;
+  background: #120000;
+  border: 1px solid #aa4444;
+  padding: 10px;
+  min-height: 140px;
+  text-align: left;
+  white-space: pre-wrap;
+}
 
-    .btn-github:hover {
-      transform: scale(1.1);
-      color: #ffaaaa;
-    }
-  </style>
+.btn-github {
+  margin-top: 25px;
+  display: inline-flex;
+  gap: 8px;
+  color: white;
+  text-decoration: none;
+  transition: transform .3s;
+}
+
+.btn-github:hover {
+  transform: scale(1.1);
+  color: #ffaaaa;
+}
+</style>
 </head>
 
 <body>
 
-<h1><u>Glossa-Online</u></h1>
+<h1><u>Glossa (Online)</u></h1>
 
-<textarea id="code">
-emfanise "kalos irthes!"
-</textarea>
+<div class="editor">
+  <div class="lines" id="lines">1</div>
+  <textarea id="code" oninput="updateLines()" onscroll="syncScroll()">
+gia i apo 1 mexri 3
+  an i = 2 tote
+    emfanise "two"
+  alios
+    emfanise i
+  telos_an
+telos_gia
+  </textarea>
+</div>
 
-<br>
 <button onclick="run()">Run ▶</button>
 
 <pre id="output"></pre>
 
 <a class="btn-github" href="https://github.com/BEIMYT/Glossa" target="_blank">
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-    <path d="M8 1.333A6.667 6.667 0 0 0 1.333 8c0 2.94 1.914 5.44 4.56 6.333.333.054.44-.146.44-.326v-1.14c-1.86.4-2.254-.9-2.254-.9-.307-.774-.754-.98-.754-.98-.607-.414.047-.406.047-.406.667.047 1.02.687 1.02.687.586 1.013 1.56.72 1.94.56.06-.433.233-.727.42-.894-1.48-.167-3.034-.74-3.034-3.273 0-.726.253-1.32.686-1.793-.066-.167-.3-.86.067-1.76 0 0 .56-.18 1.84.687.526-.146 1.1-.22 1.667-.22.566 0 1.14.074 1.666.22 1.28-.867 1.84-.687 1.84-.687.367.9.133 1.593.067 1.76.433.473.686 1.067.686 1.793 0 2.54-1.56 3.1-3.046 3.26.24.206.46.613.46 1.233v1.826c0 .18.107.387.447.326A6.667 6.667 0 0 0 14.667 8 6.667 6.667 0 0 0 8 1.333z"/>
-  </svg>
-  View on GitHub
+<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+<path d="M8 1.333A6.667 6.667 0 0 0 1.333 8c0 2.94 1.914 5.44 4.56 6.333.333.054.44-.146.44-.326v-1.14c-1.86.4-2.254-.9-2.254-.9-.307-.774-.754-.98-.754-.98-.607-.414.047-.406.047-.406.667.047 1.02.687 1.02.687.586 1.013 1.56.72 1.94.56.06-.433.233-.727.42-.894-1.48-.167-3.034-.74-3.034-3.273 0-.726.253-1.32.686-1.793-.066-.167-.3-.86.067-1.76 0 0 .56-.18 1.84.687.526-.146 1.1-.22 1.667-.22.566 0 1.14.074 1.666.22 1.28-.867 1.84-.687 1.84-.687.367.9.133 1.593.067 1.76.433.473.686 1.067.686 1.793 0 2.54-1.56 3.1-3.046 3.26.24.206.46.613.46 1.233v1.826c0 .18.107.387.447.326A6.667 6.667 0 0 0 14.667 8 6.667 6.667 0 0 0 8 1.333z"/>
+</svg>
+View on GitHub
 </a>
 
 <script>
@@ -94,88 +115,87 @@ let out = "";
 
 function print(v="") { out += v + "\n"; }
 
-function evalExpr(expr) {
-  expr = expr.replace("<>", "!=")
-             .replace(/=/g, "==")
-             .replace("<==", "<=")
-             .replace(">==", ">=");
-  try {
-    return Function("vars", "with(vars){return " + expr + "}")(vars);
-  } catch {
-    return false;
-  }
+function evalExpr(e) {
+  e = e.replace("<>", "!=")
+       .replace(/=/g,"==")
+       .replace("<==","<=")
+       .replace(">==",">=");
+  try { return Function("vars","with(vars){return "+e+"}")(vars); }
+  catch { return false; }
 }
 
-function runBlock(lines) {
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
-    if (!line) continue;
+function exec(lines) {
+  for (let i=0;i<lines.length;i++) {
+    let l = lines[i].trim();
+    if (!l) continue;
+    let t = l.split(/\s+/);
 
-    let t = line.split(/\s+/);
-    let cmd = t[0];
-
-    // Assignment
+    // assignment
     if (t.includes("<-")) {
       vars[t[0]] = evalExpr(t.slice(2).join(" "));
     }
 
-    // Print
-    else if (cmd === "emfanise" || cmd === "ektipose") {
-      let arg = t.slice(1).join(" ");
-      if (arg.startsWith('"')) print(arg.slice(1, -1));
-      else print(vars[arg] ?? evalExpr(arg));
+    // print
+    else if (t[0]=="emfanise"||t[0]=="ektipose") {
+      let a=t.slice(1).join(" ");
+      print(a.startsWith('"')?a.slice(1,-1):vars[a]??evalExpr(a));
     }
 
-    // IF / ELSE IF / ELSE
-    else if (cmd === "an") {
-      let blocks = [];
-      let current = { type: "an", cond: "", body: [] };
-
+    // IF
+    else if (t[0]=="an") {
+      let blocks=[],cur={cond:l.split("tote")[0].replace("an","").trim(),body:[]};
       while (!lines[i].includes("telos_an")) {
-        let l = lines[i].trim();
-
-        if (l.startsWith("an ")) {
-          current.cond = l.split("tote")[0].replace("an", "").trim();
+        i++; l=lines[i].trim();
+        if (l.startsWith("alios_an")) {
+          blocks.push(cur);
+          cur={cond:l.split("tote")[0].replace("alios_an","").trim(),body:[]};
         }
-        else if (l.startsWith("alios_an")) {
-          blocks.push(current);
-          current = {
-            type: "alios_an",
-            cond: l.split("tote")[0].replace("alios_an", "").trim(),
-            body: []
-          };
+        else if (l=="alios") {
+          blocks.push(cur);
+          cur={cond:null,body:[]};
         }
-        else if (l === "alios") {
-          blocks.push(current);
-          current = { type: "alios", body: [] };
-        }
-        else {
-          current.body.push(l);
-        }
-        i++;
+        else cur.body.push(l);
       }
-      blocks.push(current);
-
+      blocks.push(cur);
       for (let b of blocks) {
-        if (b.type === "alios" || evalExpr(b.cond)) {
-          runBlock(b.body);
-          break;
-        }
+        if (b.cond===null||evalExpr(b.cond)) { exec(b.body); break; }
       }
     }
 
-    else {
-      print("Δεν αναγνωρίζω την εντολή: " + line);
+    // WHILE
+    else if (t[0]=="oso") {
+      let cond=l.split("epanalave")[0].replace("oso","").trim();
+      let body=[];
+      while (!lines[++i].includes("telos_oso")) body.push(lines[i]);
+      while (evalExpr(cond)) exec(body);
     }
+
+    // FOR
+    else if (t[0]=="gia") {
+      let v=t[1];
+      let a=t.indexOf("apo"),m=t.indexOf("mexri");
+      let s=evalExpr(t.slice(a+1,m).join(" "));
+      let e=evalExpr(t.slice(m+1).join(" "));
+      let body=[];
+      while (!lines[++i].includes("telos_gia")) body.push(lines[i]);
+      for (let x=s;x<=e;x++) { vars[v]=x; exec(body); }
+    }
+
+    else print("Δεν αναγνωρίζω την εντολή: "+l);
   }
 }
 
 function run() {
-  vars = {};
-  out = "";
-  runBlock(document.getElementById("code").value.split("\n"));
-  document.getElementById("output").textContent = out;
+  vars={}; out="";
+  exec(code.value.split("\n"));
+  output.textContent=out;
 }
+
+function updateLines(){
+  lines.textContent = code.value.split("\n").map((_,i)=>i+1).join("\n");
+}
+function syncScroll(){ lines.scrollTop=code.scrollTop; }
+updateLines();
 </script>
 
 </body>
