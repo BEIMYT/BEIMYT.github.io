@@ -1,67 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Glossa</title>
-  <link rel="icon" href="favicon.png" />
+  <meta charset="UTF-8">
+  <title>Glossa – Online Interpreter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4PKVYPG2JS"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-4PKVYPG2JS');
-  </script>
+  <link rel="icon" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: monospace;
       background: #2c0202;
-      color: #fffefe;
-      padding: 20px;
+      color: #fff;
       text-align: center;
+      padding: 20px;
     }
 
     textarea {
       width: 90%;
-      max-width: 800px;
       height: 220px;
-      background: #120101;
+      background: #120000;
       color: #fff;
       border: 1px solid #aa4444;
-      padding: 12px;
-      font-family: monospace;
-      font-size: 14px;
+      padding: 10px;
+      font-size: 15px;
       resize: vertical;
     }
 
     button {
-      margin-top: 10px;
-      padding: 10px 18px;
+      margin: 15px;
+      padding: 10px 25px;
+      font-size: 16px;
       background: #aa4444;
-      border: none;
       color: white;
+      border: none;
       cursor: pointer;
-      font-size: 15px;
     }
 
     button:hover {
-      background: #cc5555;
+      background: #cc6666;
     }
 
-    #output {
-      margin: 20px auto;
+    pre {
       width: 90%;
-      max-width: 800px;
-      background: #120101;
+      margin: auto;
+      background: #120000;
       border: 1px solid #aa4444;
-      padding: 12px;
-      text-align: left;
+      padding: 10px;
       min-height: 120px;
+      text-align: left;
       white-space: pre-wrap;
-      font-family: monospace;
     }
 
     .btn-github {
@@ -71,90 +60,118 @@
       gap: 8px;
       color: white;
       text-decoration: none;
-      transition: transform 0.2s ease;
+      transition: transform 0.3s ease;
     }
 
     .btn-github:hover {
-      transform: scale(1.05);
+      transform: scale(1.1);
+      color: #ffaaaa;
     }
   </style>
 </head>
 
 <body>
 
-<h1><u>Glossa – Live Interpreter</u></h1>
-
-<p>Write Glossa code below and run it directly in your browser.</p>
+<h1><u>Glossa (Online)</u></h1>
+<p>Run Glossa directly in your browser</p>
 
 <textarea id="code">
-x <- 5
-emfanise "Hello Glossa"
-emfanise x
+gia i apo 1 mexri 2
+  emfanise "2"
+telos_gia
 </textarea>
+
 <br>
-<button onclick="runGlossa()">Run ▶</button>
+<button onclick="run()">Run ▶</button>
 
-<div id="output"></div>
+<pre id="output"></pre>
 
-<!-- GitHub Button (UNCHANGED) -->
-<a href="https://github.com/BEIMYT/Glossa" target="_blank" class="btn-github">
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path fill="currentColor"
-      d="M8 1.33A6.67 6.67 0 0 0 1.33 8c0 2.95 1.92 5.45 4.56 6.33.33.06.44-.14.44-.31v-1.09c-1.86.4-2.25-1.29-2.25-1.29-.31-.77-.74-.97-.74-.97-.61-.41.05-.4.05-.4.67.05 1.02.69 1.02.69.6 1.02 1.58.73 1.97.56.06-.44.24-.73.43-.9-1.48-.17-3.04-.74-3.04-3.27 0-.72.26-1.31.69-1.77-.07-.17-.3-.86.07-1.79 0 0 .56-.18 1.83.68.53-.15 1.1-.22 1.67-.22.57 0 1.14.07 1.67.22 1.27-.86 1.83-.68 1.83-.68.37.93.14 1.62.07 1.79.43.46.69 1.05.69 1.77 0 2.54-1.56 3.1-3.05 3.26.25.21.46.63.46 1.27v1.88c0 .17.11.38.44.31A6.67 6.67 0 0 0 14.67 8 6.67 6.67 0 0 0 8 1.33Z"/>
+<a class="btn-github" href="https://github.com/BEIMYT/Glossa" target="_blank">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M8 1.333A6.667 6.667 0 0 0 1.333 8c0 2.94 1.914 5.44 4.56 6.333.333.054.44-.146.44-.326v-1.14c-1.86.4-2.254-.9-2.254-.9-.307-.774-.754-.98-.754-.98-.607-.414.047-.406.047-.406.667.047 1.02.687 1.02.687.586 1.013 1.56.72 1.94.56.06-.433.233-.727.42-.894-1.48-.167-3.034-.74-3.034-3.273 0-.726.253-1.32.686-1.793-.066-.167-.3-.86.067-1.76 0 0 .56-.18 1.84.687.526-.146 1.1-.22 1.667-.22.566 0 1.14.074 1.666.22 1.28-.867 1.84-.687 1.84-.687.367.9.133 1.593.067 1.76.433.473.686 1.067.686 1.793 0 2.54-1.56 3.1-3.046 3.26.24.206.46.613.46 1.233v1.826c0 .18.107.387.447.326A6.667 6.667 0 0 0 14.667 8 6.667 6.667 0 0 0 8 1.333z"/>
   </svg>
-  <span>View on GitHub</span>
+  View on GitHub
 </a>
 
 <script>
-let variables = {};
-let output = document.getElementById("output");
+let vars = {};
+let output = "";
 
-function print(msg="") {
-  output.textContent += msg + "\n";
+function print(txt="") {
+  output += txt + "\n";
 }
 
 function evalExpr(expr) {
+  expr = expr.replace("<>", "!=")
+             .replace(/=/g, "==")
+             .replace("<==", "<=")
+             .replace(">==", ">=");
   try {
-    expr = expr.replace(/<>/g, "!=")
-               .replace(/=/g, "==")
-               .replace(/<==/g, "<=")
-               .replace(/>==/g, ">=");
-    return Function("vars", `with(vars){ return ${expr} }`)(variables);
+    return Function("vars", "with(vars){return " + expr + "}")(vars);
   } catch {
     return expr;
   }
 }
 
-function runProgram(lines) {
+function runBlock(lines) {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i].trim();
     if (!line) continue;
 
-    let tokens = line.split(" ");
-    let cmd = tokens[0];
+    let t = line.split(/\s+/);
+    let cmd = t[0];
 
     // Assignment
-    if (line.includes("<-")) {
-      let [v, expr] = line.split("<-");
-      variables[v.trim()] = evalExpr(expr.trim());
+    if (t.includes("<-")) {
+      vars[t[0]] = evalExpr(t.slice(2).join(" "));
     }
 
     // Print
     else if (cmd === "emfanise" || cmd === "ektipose") {
-      let arg = line.slice(cmd.length).trim();
-      if (arg.startsWith('"') && arg.endsWith('"'))
+      let arg = t.slice(1).join(" ");
+      if (arg.startsWith('"') && arg.endsWith('"')) {
         print(arg.slice(1, -1));
-      else if (variables[arg] !== undefined)
-        print(variables[arg]);
-      else
+      } else if (vars[arg] !== undefined) {
+        print(vars[arg]);
+      } else {
         print(evalExpr(arg));
+      }
     }
 
-    // Input
-    else if (cmd === "diavase") {
-      let v = tokens[1];
-      let val = prompt(`${v} =`);
-      variables[v] = isNaN(val) ? val : Number(val);
+    // IF
+    else if (cmd === "an") {
+      let block = [];
+      while (!lines[i].includes("telos_an")) {
+        block.push(lines[i]);
+        i++;
+      }
+      let head = block[0].split("tote");
+      if (evalExpr(head[0].replace("an", "").trim())) {
+        runBlock(block.slice(1));
+      }
+    }
+
+    // WHILE
+    else if (cmd === "oso") {
+      let block = [];
+      let cond = line.split("epanalave")[0].replace("oso", "").trim();
+      while (!lines[i].includes("telos_oso")) {
+        block.push(lines[++i]);
+      }
+      while (evalExpr(cond)) runBlock(block);
+    }
+
+    // FOR
+    else if (cmd === "gia") {
+      let v = t[1];
+      let start = evalExpr(t[t.indexOf("apo")+1]);
+      let end = evalExpr(t[t.indexOf("mexri")+1]);
+      let body = [];
+      while (!lines[i].includes("telos_gia")) body.push(lines[++i]);
+      for (let x = start; x <= end; x++) {
+        vars[v] = x;
+        runBlock(body);
+      }
     }
 
     else {
@@ -163,11 +180,12 @@ function runProgram(lines) {
   }
 }
 
-function runGlossa() {
-  output.textContent = "";
-  variables = {};
-  let code = document.getElementById("code").value.split("\n");
-  runProgram(code);
+function run() {
+  vars = {};
+  output = "";
+  let lines = document.getElementById("code").value.split("\n");
+  runBlock(lines);
+  document.getElementById("output").textContent = output;
 }
 </script>
 
