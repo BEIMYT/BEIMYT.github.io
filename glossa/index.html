@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="icon" href="favicon.png">
-  <link rel="stylesheet" href="style.css">
 
   <style>
     body {
@@ -19,13 +18,12 @@
 
     textarea {
       width: 90%;
-      height: 220px;
+      height: 240px;
       background: #120000;
       color: #fff;
       border: 1px solid #aa4444;
       padding: 10px;
       font-size: 15px;
-      resize: vertical;
     }
 
     button {
@@ -73,12 +71,15 @@
 <body>
 
 <h1><u>Glossa (Online)</u></h1>
-<p>Run Glossa directly in your browser</p>
 
 <textarea id="code">
-gia i apo 1 mexri 2
-  emfanise "2"
-telos_gia
+an 11 > 10 tote
+  emfanise "a"
+alios
+  emfanise "aa"
+alios_an 2 < 0 tote
+  emfanise "e"
+telos_an
 </textarea>
 
 <br>
@@ -95,11 +96,9 @@ telos_gia
 
 <script>
 let vars = {};
-let output = "";
+let out = "";
 
-function print(txt="") {
-  output += txt + "\n";
-}
+function print(v="") { out += v + "\n"; }
 
 function evalExpr(expr) {
   expr = expr.replace("<>", "!=")
@@ -109,7 +108,7 @@ function evalExpr(expr) {
   try {
     return Function("vars", "with(vars){return " + expr + "}")(vars);
   } catch {
-    return expr;
+    return false;
   }
 }
 
@@ -129,48 +128,45 @@ function runBlock(lines) {
     // Print
     else if (cmd === "emfanise" || cmd === "ektipose") {
       let arg = t.slice(1).join(" ");
-      if (arg.startsWith('"') && arg.endsWith('"')) {
-        print(arg.slice(1, -1));
-      } else if (vars[arg] !== undefined) {
-        print(vars[arg]);
-      } else {
-        print(evalExpr(arg));
-      }
+      if (arg.startsWith('"')) print(arg.slice(1, -1));
+      else print(vars[arg] ?? evalExpr(arg));
     }
 
-    // IF
+    // IF / ELSE IF / ELSE
     else if (cmd === "an") {
-      let block = [];
+      let blocks = [];
+      let current = { type: "an", cond: "", body: [] };
+
       while (!lines[i].includes("telos_an")) {
-        block.push(lines[i]);
+        let l = lines[i].trim();
+
+        if (l.startsWith("an ")) {
+          current.cond = l.split("tote")[0].replace("an", "").trim();
+        }
+        else if (l.startsWith("alios_an")) {
+          blocks.push(current);
+          current = {
+            type: "alios_an",
+            cond: l.split("tote")[0].replace("alios_an", "").trim(),
+            body: []
+          };
+        }
+        else if (l === "alios") {
+          blocks.push(current);
+          current = { type: "alios", body: [] };
+        }
+        else {
+          current.body.push(l);
+        }
         i++;
       }
-      let head = block[0].split("tote");
-      if (evalExpr(head[0].replace("an", "").trim())) {
-        runBlock(block.slice(1));
-      }
-    }
+      blocks.push(current);
 
-    // WHILE
-    else if (cmd === "oso") {
-      let block = [];
-      let cond = line.split("epanalave")[0].replace("oso", "").trim();
-      while (!lines[i].includes("telos_oso")) {
-        block.push(lines[++i]);
-      }
-      while (evalExpr(cond)) runBlock(block);
-    }
-
-    // FOR
-    else if (cmd === "gia") {
-      let v = t[1];
-      let start = evalExpr(t[t.indexOf("apo")+1]);
-      let end = evalExpr(t[t.indexOf("mexri")+1]);
-      let body = [];
-      while (!lines[i].includes("telos_gia")) body.push(lines[++i]);
-      for (let x = start; x <= end; x++) {
-        vars[v] = x;
-        runBlock(body);
+      for (let b of blocks) {
+        if (b.type === "alios" || evalExpr(b.cond)) {
+          runBlock(b.body);
+          break;
+        }
       }
     }
 
@@ -182,10 +178,9 @@ function runBlock(lines) {
 
 function run() {
   vars = {};
-  output = "";
-  let lines = document.getElementById("code").value.split("\n");
-  runBlock(lines);
-  document.getElementById("output").textContent = output;
+  out = "";
+  runBlock(document.getElementById("code").value.split("\n"));
+  document.getElementById("output").textContent = out;
 }
 </script>
 
