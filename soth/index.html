@@ -9,5 +9,21 @@
 </head>
 <body>
     <iframe src="SOΤΗ.pdf"></iframe>
+    
+    <script>
+        // Disable right-click
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable Ctrl+S (Save) and Ctrl+P (Print)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
 </body>
 </html>
